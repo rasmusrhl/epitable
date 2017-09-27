@@ -2,7 +2,7 @@ Type: Package
 Package: epitable
 Version: 0.1.0
 Date: 2017-09-27
-Title: Create HTML-tables in the style used in epidemiological papers
+Title: Create HTML tables in the style used in epidemiological papers
 Authors@R: person("Rasmus", "Larsen", email = "rasmushertzumlarsen@gmail.com",
                   role = c("aut", "cre"))
 Author: Rasmus Larsen [aut, cre]                  
@@ -11,7 +11,7 @@ Description: Functions for creating publication ready tables in HTML format,
     commonly used in epidemiological publications. This includes descriptive 
     tables of  frequencies and percentages, and also analytical tables 
     presenting regression models. 
-URL: <https://github.com/rasmusrhl/epi1> <https://rasmusrhl.github.io/epi_doc/>
+URL: <https://github.com/rasmusrhl/epitable> <https://rasmusrhl.github.io/epi_doc/>
 Depends: 
     R (>= 3.4.1),
 Imports:

@@ -1,5 +1,5 @@
 ## ---- echo=FALSE, message=FALSE, warning=FALSE---------------------------
-library(epi1)
+library(epitable)
 library(dplyr)
 
 ## ------------------------------------------------------------------------

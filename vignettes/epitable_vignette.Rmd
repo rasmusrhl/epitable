@@ -1,5 +1,5 @@
 ---
-title: "Epi1"
+title: "epitable"
 author: "Rasmus Larsen"
 date: "`r Sys.Date()`"
 output:
@@ -7,17 +7,17 @@ output:
     css: null
     theme: null
 vignette: >
-  %\VignetteIndexEntry{epi_vignette}
+  %\VignetteIndexEntry{epitable_vignette}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-library(epi1)
+library(epitable)
 library(dplyr)
 ```
 
 
-The Epi1 package creates a frequency and percentage table commonly used in
+The epitable package creates a frequency and percentage table commonly used in
 epidemiological papers. It is a wrapper for the [htmlTables-package](https://cran.r-project.org/web/packages/htmlTable/vignettes/general.html).
 
 ```{r}
