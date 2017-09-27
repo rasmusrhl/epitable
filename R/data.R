@@ -1,4 +1,4 @@
-#' Prices of 50,000 round cut diamonds
+#' Prices of 50,000 round cut diamonds. From the ggplot2 package.
 #'
 #' A dataset containing the prices and other attributes of almost 54,000
 #'  diamonds. The variables are as follows:

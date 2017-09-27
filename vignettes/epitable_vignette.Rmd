@@ -18,7 +18,7 @@ library(dplyr)
 
 
 The epitable package creates a frequency and percentage table commonly used in
-epidemiological papers. It is a wrapper for the [htmlTables-package](https://cran.r-project.org/web/packages/htmlTable/vignettes/general.html).
+epidemiological papers. It is a wrapper for the [htmlTables-package](https://cran.r-project.org/package=htmlTable).
 
 ```{r}
 head(example_data)

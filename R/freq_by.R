@@ -17,10 +17,7 @@
 #' @export freq_by
 #' @examples
 #' # Outputs HTML:
-#' # output <- freq_by(example_data, c("cut", "color"), "clarity")
-#' # temp1 <- tempfile(pattern = "file", tmpdir = tempdir(), fileext = ".html")
-#' # readr::write_file( output, temp1 )
-#' # utils::browseURL( temp1 )
+#' output <- freq_by(example_data, c("cut", "color"), "clarity")
 
 
 freq_by <- function(dataset, var_vector, by_group = NULL, include_total = TRUE, htmlout = TRUE) {

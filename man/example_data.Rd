@@ -3,7 +3,7 @@
 \docType{data}
 \name{example_data}
 \alias{example_data}
-\title{Prices of 50,000 round cut diamonds}
+\title{Prices of 50,000 round cut diamonds. From the ggplot2 package.}
 \format{A data frame with 53940 rows and 10 variables:
 \describe{
   \item{price}{price in US dollars (\$326--\$18,823)}
