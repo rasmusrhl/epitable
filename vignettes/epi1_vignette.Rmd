@@ -1,0 +1,52 @@
+---
+title: "Epi1"
+author: "Rasmus Larsen"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    css: null
+    theme: null
+vignette: >
+  %\VignetteIndexEntry{epi_vignette}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(epi1)
+library(dplyr)
+```
+
+
+The Epi1 package creates a frequency and percentage table commonly used in
+epidemiological papers. It is a wrapper for the [htmlTables-package](https://cran.r-project.org/web/packages/htmlTable/vignettes/general.html).
+
+```{r}
+head(example_data)
+```
+
+Counts and frequencies of the variables `color`and `clarity` grouped by `cut` is obtained below:
+```{r, echo=TRUE, results='asis'}
+freq_by(dataset = example_data, var_vector = c("color", "clarity"), by_group = "cut" )
+```
+
+The `by_group` variable must be of class factor, to ensure correct order.  
+
+
+
+To do in a possible future:
+
+* Add totals to each of the `by_group`s
+* option to specify better names to the rgroup, not just the variable names.
+* function for adding reference levels to regression models.
+* include other summary statistics
+* option to render blank cells containing few observations, to ensure anonymity.
+
+The output is a HTML-table created by the htmlTable-package. The HTML-output 
+looks best if no CSS is used.
+
+
+
+
+
+
+
