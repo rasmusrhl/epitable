@@ -17,14 +17,10 @@
 #' @export freq_by
 #' @examples
 #' # Outputs HTML:
-#' freq_by( example_data,  var_vector = c("cut", "clarity"),
-#' by_group = "color") -> output
-#' #output can be used in a knitr-report, or examined directly in using the
-#' # Viewer.
-#' readr::write_file( output, "output_example.html")
-#' utils::browseURL("output_example.html")
-
-
+#' # output <- freq_by(example_data, c("cut", "color"), "clarity")
+#' # temp1 <- tempfile(pattern = "file", tmpdir = tempdir(), fileext = ".html")
+#' # readr::write_file( output, temp1 )
+#' # utils::browseURL( temp1 )
 
 
 freq_by <- function(dataset, var_vector, by_group = NULL, include_total = TRUE, htmlout = TRUE) {
