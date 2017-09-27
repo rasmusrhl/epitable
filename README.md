@@ -1,6 +1,3 @@
-# epi1
+# epitable
 
-A function for creating percentage and frequency tables. Examples here: https://rasmusrhl.github.io/epi1/
-
-# Planned
-Functinos for presenting a regression models. 
+Functions for creating percentage and frequency tables commonly used in epidemiology. https://rasmusrhl.github.io/epi_doc/
