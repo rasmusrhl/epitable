@@ -1,2 +1,10 @@
 language: r
 cache: packages
+
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $a81f7f18204047a776e5ae90166f24645d95fb92 # Set in travis-ci.org dashboard
+  on:
+    branch: master
