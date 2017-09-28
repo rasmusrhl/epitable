@@ -3,11 +3,11 @@
 #'
 #' @param dataset A dataset
 #' @param var_vector A character vector containing names of the columns in the
-#' input dataset to calculate frequencies and percentages for.
-#' @param by_group A string referring to a factor column in the input dataset
+#' \code{dataset} to calculate frequencies and percentages for.
+#' @param by_group A string referring to a factor column in the \code{dataset}
 #' by which to stratify the calculations.
-#' @param include_total whether to include frequencies and percentages not
-#' stratified by the \code{by_group}.
+#' @param include_total whether to include two extra columns of marginal
+#' frequencies and percentages, i.e. not stratified by the \code{by_group}.
 #' @param htmlout Whether to output to html (default and intended usage), or
 #' as r-dataframe.
 #' @details The output is a table in HTML which can be viewed in a browser or

@@ -11,13 +11,13 @@ freq_by(dataset, var_vector, by_group = NULL, include_total = TRUE,
 \item{dataset}{A dataset}
 
 \item{var_vector}{A character vector containing names of the columns in the
-input dataset to calculate frequencies and percentages for.}
+\code{dataset} to calculate frequencies and percentages for.}
 
-\item{by_group}{A string referring to a factor column in the input dataset
+\item{by_group}{A string referring to a factor column in the \code{dataset}
 by which to stratify the calculations.}
 
-\item{include_total}{whether to include frequencies and percentages not
-stratified by the \code{by_group}.}
+\item{include_total}{whether to include two extra columns of marginal
+frequencies and percentages, i.e. not stratified by the \code{by_group}.}
 
 \item{htmlout}{Whether to output to html (default and intended usage), or
 as r-dataframe.}
