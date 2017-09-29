@@ -18,37 +18,56 @@
 #' sex  + ph.karno + wt.loss + species, data =  lung)
 #' add_reference_levels( model_object = input_to_function)
 
+add_reference_levels(model1)
 
-
+df %>% count(age_bin)
 
 add_reference_levels <- function( model_object ) {
 
-  suppressWarnings(
   if (   class( model_object ) == "coxph" ) {
 
+    # extract pretty categorical variables (used for presentation, including ref category)
+    cat_variables_n_l      <-  model_object$xlevels
+    cat_variables_n        <-  names( cat_variables_n_l )
+    cat_variables_l        <-  map_dbl(cat_variables_n_l,   length )
+    cat_variables_output   <-  map2( cat_variables_n, cat_variables_l, .f = function(x,y ) rep( x, each = y)) %>% unlist()
 
-    inside_list1 <- model_object$xlevels
-    output_list <- list()
 
-    for (i in 1:length(inside_list1) ) {
-      output_list[[i]] <-  paste0( names(inside_list1[i]),  as.character( unlist( inside_list1[i] )  )  )
-    }
-    categorical_covariates <- unlist( output_list)
+    # extract pretty categorical categories (used for presentation)
+    cat_categories         <- model_object$xlevels %>% unlist() %>% as.character()
 
-    numeric_covarites <- names( attr( model_object$terms, "dataClasses" )[
-           attr( model_object$terms, "dataClasses" )  == "numeric"  ]  )
-    all_covariates92681 <- c( categorical_covariates, numeric_covarites )
-    covariate_df_92681 <- data.frame( term = all_covariates92681)
+    # combine pretty categorical variables and numeric variables
+
+    term_column_numeric    <- names( attr( model_object$terms, "dataClasses" )[
+                                   attr( model_object$terms, "dataClasses" )  == "numeric"  ]  )
+
+    pretty_variables       <- c( cat_variables_output, term_column_numeric )
+    pretty_categories      <- c( cat_categories, term_column_numeric )
+
+
+    # extract terms column in style of model output (used for join)
+
+    term_column_categoric  <- map2( cat_variables_n, cat_variables_n_l, function(x,y) paste0(x,y )  )  %>% unlist()
+
+
+    left_column            <-  data.frame( term = c( term_column_categoric, term_column_numeric ) )
+    left_column$variables  <-  pretty_variables
+    left_column$categories <-  pretty_categories
 
     # the full covariate list is left joined with the statistical values
-    values_92681 <- broom::tidy(model_object, exponentiate = TRUE )
-    dplyr::left_join( covariate_df_92681, values_92681, "term" ) -> output_df1
-    output_df1$xlevels <- c( as.character( unlist( model_object$xlevels ) ),
-                             numeric_covarites )
-    output_df1
+    tidy_model_output          <- broom::tidy(model_object, exponentiate = TRUE )
+    suppressWarnings( dplyr::left_join( left_column, tidy_model_output, "term" ) ) -> add_ref_output
+    print(add_ref_output)
   }
-  else { print( "Only works with coxph objects")}  )
+
 }
 
+
+
+ lung <- survival::lung
+ lung$species <- iris$Species[ sample.int( 150, 228, replace = TRUE )]
+ input_to_function <- survival::coxph( survival::Surv( time, status == 2 ) ~ age +
+ sex  + ph.karno + wt.loss + species, data =  lung)
+ add_reference_levels( model_object = input_to_function)
 
 
