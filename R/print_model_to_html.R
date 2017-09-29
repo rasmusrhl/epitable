@@ -3,6 +3,7 @@
 #' @description Prints on or more lists of regression models to HTML. Currently
 #'     only works with class coxph.
 #' @param univariate_models_list List of univariate models
+#' @importFrom Hmisc cut2
 #' @export print_model_to_html
 #'
 #'
@@ -24,7 +25,13 @@ model1     <- survival::coxph( survival::Surv( time = time, event = status==1) ~
 
 print_model_to_html <- function( univariate_models_list ) {
 
+  if(! univariate_models_list) {
+    stop ("univariate mdels list")
+  }
 
 }
 
+print_model_to_html( model_list)
 
+
+is.list(model_list)
