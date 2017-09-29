@@ -43,9 +43,10 @@ add_reference_levels <- function( model_object ) {
 
     pretty_variables       <- c( cat_variables_output, term_column_numeric )
     pretty_categories      <- c( cat_categories, term_column_numeric )
+    column_type            <- c( rep( "char_or_factor", length(cat_variables_output ) ),
+                                 rep( "numeric"       , length( term_column_numeric ) ) )
 
-
-    # extract terms column in style of model output (used for join)
+    # create terms column in style of model output (used for join)
 
     term_column_categoric  <- map2( cat_variables_n, cat_variables_n_l, function(x,y) paste0(x,y )  )  %>% unlist()
 
@@ -53,6 +54,8 @@ add_reference_levels <- function( model_object ) {
     left_column            <-  data.frame( term = c( term_column_categoric, term_column_numeric ) )
     left_column$variables  <-  pretty_variables
     left_column$categories <-  pretty_categories
+    left_column$type       <-  column_type
+
 
     # the full covariate list is left joined with the statistical values
     tidy_model_output          <- broom::tidy(model_object, exponentiate = TRUE )
@@ -64,10 +67,5 @@ add_reference_levels <- function( model_object ) {
 
 
 
- lung <- survival::lung
- lung$species <- iris$Species[ sample.int( 150, 228, replace = TRUE )]
- input_to_function <- survival::coxph( survival::Surv( time, status == 2 ) ~ age +
- sex  + ph.karno + wt.loss + species, data =  lung)
- add_reference_levels( model_object = input_to_function)
 
 
