@@ -18,9 +18,7 @@
 #' sex  + ph.karno + wt.loss + species, data =  lung)
 #' add_reference_levels( model_object = input_to_function)
 
-add_reference_levels(model1)
 
-df %>% count(age_bin)
 
 add_reference_levels <- function( model_object ) {
 
@@ -64,8 +62,6 @@ add_reference_levels <- function( model_object ) {
   }
 
 }
-
-
 
 
 
