@@ -58,7 +58,7 @@ add_reference_levels <- function( model_object ) {
     # the full covariate list is left joined with the statistical values
     tidy_model_output          <- broom::tidy(model_object, exponentiate = TRUE )
     suppressWarnings( dplyr::left_join( left_column, tidy_model_output, "term" ) ) -> add_ref_output
-    print(add_ref_output)
+    add_ref_output
   }
 
 }

@@ -8,14 +8,13 @@
 #'
 #'
 
-library(dplyr)
 
 
 
 
-model_to_html <- function( univariate_models_list, model_class = "coxph" ) {
+model_to_html <- function( univariate_models_list, model_class = "coxph", simple = TRUE ) {
 
-  if(! is.list(univariate_models_list)) {
+  if(  !class(univariate_models_list)=="list") {
     stop ("univariate_models_list must be a list")
   }
 
@@ -28,13 +27,25 @@ model_to_html <- function( univariate_models_list, model_class = "coxph" ) {
   }
 
 univariate_models_list %>%
-  purrr::map(  add_reference_levels )
+  purrr::map(  add_reference_levels )  %>% bind_rows() -> univariate_models
 
 }
 
-model_to_html(model_list)
 
-add_reference_levels(model1 )
+model_to_html(model_list) -> output
+model_to_html(model_list) %>% bind_rows()
+model_to_html( list(model1  ) )
+class( list(model1  ) )  == "list"
+
+class( model1 )
+output %>% bind_rows()
+
+out1
+
+print( round( output$conf.high, 3) , na.print = "-"  )
+
+
+add_reference_levels(model1 ) -> output
 
 df %>% count(ph_bin)
 
