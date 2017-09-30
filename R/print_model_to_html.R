@@ -28,41 +28,66 @@ model_to_html <- function( univariate_models_list, model_class = "coxph", simple
      all() -> are_all_models_coxph
    if(! are_all_models_coxph ) stop ("When model_class is 'coxph' all models in univariate_models_list must be class 'coxph' ")
   }
+  
+  
+  tidy_up_model_df <- function(univariate_models) {
+    univariate_models %>%
+      transmute( variables,
+                 categories,
+                 estimate = format( round( estimate, decimals_estimate ), nsmall = decimals_estimate),
+                 CI = paste0( format( round( conf.low, decimals_estimate),nsmall= decimals_estimate),
+                              "-", 
+                              format( round( conf.high, decimals_estimate ), nsmall = decimals_estimate )) ,
+                 )  -> tidy_model
+    
+    tidy_model$estimate[ stringr::str_detect(  string = tidy_model$estimate,  pattern =  "NA") ] <- "1" 
+    tidy_model$CI[ stringr::str_detect(  string = tidy_model$CI,  pattern =  "NA") ]             <- "Ref" 
+    
+    tidy_model
+  }
+
+  
+  to_html <- function(tidy_model) {
+    
+    rle_1   <-   rle(tidy_model$variables)
+    rle_1$values[  which( rle_1$lengths == 1 )  ]  <- "&nbsp;" # single rows dont nead rgroup header
+    
+    
+    htmlTable::htmlTable( 
+     tidy_model , 
+     rnames   = FALSE,
+     rgroup   = rle_1$values,
+     n.rgroup = rle_1$lengths,
+     align    = c("l","r") 
+    ) 
+  }
+   add_reference_levels(univariate_models_list) %>%
+   tidy_up_model_df() %>%
+    to_html()
+
+}
+
+
+model_to_html(list(model1))
+
+tidy_up_model_df(tidy_model)
+
+
+
+temp_test
+out11$HR
 
 univariate_models_list %>%
   purrr::map(  add_reference_levels )  %>% bind_rows() -> univariate_models
 
-univariate_models
 
-}
 
-decimals_estimate <- 2
+tidy_up_model_df(tidy_model) -> temp_test
+tidy_model
 
-tidy_up_model_df <- function(univariate_models) {
-  tidy_model %>%
-    transmute( variables,
-               categories,
-               HR = round( estimate, decimals_estimate ),
-               conf.low, "-" conf.high )
-               )
- tidy_model %>% head()  
-}
+format(round(x, 2), nsmall = 2)
 
-to_html <- function(tidy_model) {
-  
-rle_1   <-   rle(tidy_model$variables)
-rle_1$values[  which( rle_1$lengths == 1 )  ]  <- "&nbsp;" # single rows dont nead rgroup header
 
-to_html <- tidy_model %>% select( categories, estimate, conf.low, conf.high )
-htmlTable::htmlTable( 
- tidy_model , 
- rnames   = FALSE,
- rgroup   = rle_1$values,
- n.rgroup = rle_1$lengths,
- align    = c("l","r")
- 
-) 
-}
 
 to_html(tidy_model) -> htmloutput
 
@@ -84,58 +109,13 @@ htmlTable::htmlTable(
 
 
 model_to_html( list(model1  ) ) -> tidy_model
+readr::write_file( tidy_model, "asdf.html")
+utils::browseURL("asdf.html")
 
 model_to_html(model_list) 
 
 
 
-table1 <- table1[, -1] # exclude first column, because it is shown in the rgroup.
-names(table1) <-
-  c(" ", rep(c("n", "(%)"), number_of_summaries_in_table))
-
-css_matrix     <-
-  matrix(data = "padding-left: 0.5cm; padding-right: 0.5cm;",
-         nrow = nrow(table1),
-         ncol = ncol(table1))
-css_matrix[, 1] <-
-  "padding-left: 0.4cm; padding-right: 0.3cm;"
-
-htmlTable::htmlTable(
-  x =  table1,
-  rnames = FALSE,
-  cgroup   = c_group_vektor,
-  n.cgroup = n_c_group_vektor,
-  rgroup   = rgroup_vektor,
-  n.rgroup = n_rgroup_vektor,
-  align = alignment_vektor,
-  css.rgroup = "font-style: italic;padding-top: 0.4cm;padding-right: 0.4cm;padding-bottom: 0.2cm;",
-  css.cell = css_matrix
-)
-
-
-
-model1$n
-df %>% count(sex)
-df %>% count(ph_bin)
-model1
-str(model1)
-attr(model1, 
-
-model_to_html(model_list) %>% bind_rows()
-class( list(model1  ) )  == "list"
-
-class( model1 )
-output %>% bind_rows()
-
-out1
-
-print( round( output$conf.high, 3) , na.print = "-"  )
-
-
-add_reference_levels(model1 ) 
-add_reference_levels(model1 ) -> output
-
-df %>% count(ph_bin)
 
 # Test function -----------------------------------------------------------
 
