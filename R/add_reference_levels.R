@@ -53,6 +53,7 @@ add_reference_levels <- function( model_object ) {
     left_column$variables  <-  pretty_variables
     left_column$categories <-  pretty_categories
     left_column$type       <-  column_type
+    left_column$n          <-  model_object$n
 
 
     # the full covariate list is left joined with the statistical values
@@ -64,4 +65,10 @@ add_reference_levels <- function( model_object ) {
 }
 
 
-
+# glm1 <- glm( Sepal.Width ~  Petal.Width + Species, data = iris)
+# lm1 <- lm( Sepal.Width ~  Petal.Width + Species, data = iris)
+# 
+# 
+# 
+# str(lm1)
+# str(glm1)
