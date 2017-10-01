@@ -3,6 +3,8 @@
 #'     model object
 #'
 #' @param model_object A cox.ph object
+#' @param exponentiate defaults to NULL. Is set to FALSE if model input is class
+#'     glm or lm, and is set to TRUE if model is class coxph.
 #' @details Prints summary statistics of cox.ph model using the
 #'     \code{broom}-package, and adds a reference level to the
 #'     categorical predictors, as is commonly used in epidemiological
@@ -18,11 +20,26 @@
 #' sex  + ph.karno + wt.loss + species, data =  lung)
 #' add_reference_levels( model_object = input_to_function)
 
+# model_object <- glm_logistic
+# glm_logistic$coefficients
+# str(glm_logistic)
+# glm_linear
+# glm_logistic
+# model1
+# add_reference_levels(glm2)
+# add_reference_levels(glm1)
 
+add_reference_levels <- function( model_object, exponentiate = FALSE  ) {
+  
+    if ("ordered" %in% attr(model1$terms, "dataclasses")) {
+       stop ("add_reference_levels() does not support ordered factors in the model object. Check the class of the covariates in the model and ensure that they are not class 'ordered' ")
+    }
+      
+    # if ( "coxph" %in% class(model_object) & is.null(exponentiate) ) {
+    #  exponentiate <- TRUE     } else if ( model_object$family$link %in% "logit" & is.null(exponentiate ) {
+    #  exponentiate <- TRUE
+    #   } 
 
-add_reference_levels <- function( model_object ) {
-
-  if (   class( model_object ) == "coxph" ) {
 
     # extract pretty categorical variables (used for presentation, including ref category)
     cat_variables_n_l      <-  model_object$xlevels
@@ -53,22 +70,27 @@ add_reference_levels <- function( model_object ) {
     left_column$variables  <-  pretty_variables
     left_column$categories <-  pretty_categories
     left_column$type       <-  column_type
-    left_column$n          <-  model_object$n
+    left_column$n          <-  if ( "coxph" %in% class(model_object)) model_object$n else {
+                                if ( "glm" %in% class(model_object)) nrow( model_object$model) }
 
 
     # the full covariate list is left joined with the statistical values
-    tidy_model_output          <- broom::tidy(model_object, exponentiate = TRUE )
+    
+    tidy_model_output          <- broom::tidy(model_object, exponentiate =  exponentiate )
     suppressWarnings( dplyr::left_join( left_column, tidy_model_output, "term" ) ) -> add_ref_output
     add_ref_output
-  }
 
 }
 
 
-# glm1 <- glm( Sepal.Width ~  Petal.Width + Species, data = iris)
-# lm1 <- lm( Sepal.Width ~  Petal.Width + Species, data = iris)
+# test
+# add_reference_levels(model1)
+# add_reference_levels(glm_logistic, exponentiate = TRUE)
 # 
+# diamonds <- ggplot2::diamonds
+# diamonds$color <- factor(diamonds$color, ordered = FALSE)
+# diamonds$clarity <- factor(diamonds$clarity, ordered = FALSE)
+# glm_logistic <- glm( cut=="Ideal" ~  color + clarity + x , data = diamonds, family = "binomial")
 # 
-# 
-# str(lm1)
-# str(glm1)
+# glm_linear <- glm( Sepal.Width ~  Petal.Width + Species, data = iris)
+

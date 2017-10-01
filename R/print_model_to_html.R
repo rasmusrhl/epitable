@@ -20,7 +20,7 @@ model_to_html <- function( univariate_models_list, model_class = "coxph", simple
   if(  !class(univariate_models_list)=="list") {
     stop ("univariate_models_list must be a list")
   }
-
+  
   if(model_class == "coxph") {
     purrr::map( univariate_models_list, class ) %>%
      purrr::map( function(x) "coxph" %in% x ) %>%
@@ -35,9 +35,9 @@ model_to_html <- function( univariate_models_list, model_class = "coxph", simple
       transmute( variables,
                  categories,
                  estimate = format( round( estimate, decimals_estimate ), nsmall = decimals_estimate),
-                 CI = paste0( format( round( conf.low, decimals_estimate),nsmall= decimals_estimate),
+                 CI = paste0( format( round( conf.low,  decimals_estimate ), nsmall = decimals_estimate),
                               "-", 
-                              format( round( conf.high, decimals_estimate ), nsmall = decimals_estimate )) ,
+                              format( round( conf.high, decimals_estimate ), nsmall = decimals_estimate ) )
                  )  -> tidy_model
     
     tidy_model$estimate[ stringr::str_detect(  string = tidy_model$estimate,  pattern =  "NA") ] <- "1" 
@@ -45,31 +45,78 @@ model_to_html <- function( univariate_models_list, model_class = "coxph", simple
     
     tidy_model
   }
+  decimals_estimate <- 2
 
-  
   to_html <- function(tidy_model) {
     
-    rle_1   <-   rle(tidy_model$variables)
-    rle_1$values[  which( rle_1$lengths == 1 )  ]  <- "&nbsp;" # single rows dont nead rgroup header
+    rgroup_vector       <-   stringr::str_to_title( rle(tidy_model$variables)$values )
+    n_rgroup_vector     <-   rle(tidy_model$variables)$lengths
+    rgroup_vector[ n_rgroup_vector == 1 ]   <- "&nbsp;" # single rows dont need rgroup header
     
+    css_rgroup      <- "font-style: italic;padding-top: 0.4cm;padding-right: 0.4cm;padding-bottom: 0.2cm;"
+    tidy_model      <- tidy_model[,-1]
+    css_matrix      <- matrix(data = "padding-left: 0.5cm; padding-right: 0.5cm;",
+                              nrow = nrow(tidy_model),
+                              ncol = ncol(tidy_model))
+    css_matrix[, 1] <- "padding-left: 0.4cm; padding-right: 0.3cm;"
     
     htmlTable::htmlTable( 
-     tidy_model , 
-     rnames   = FALSE,
-     rgroup   = rle_1$values,
-     n.rgroup = rle_1$lengths,
-     align    = c("l","r") 
+     x          = tidy_model , 
+     rnames     = FALSE,
+     rgroup     = rgroup_vector,
+     n.rgroup   = n_rgroup_vector,
+     align      = c("l","r"),
+     css.rgroup = css_rgroup,
+     css.cell   = css_matrix
     ) 
   }
-   add_reference_levels(univariate_models_list) %>%
-   tidy_up_model_df() %>%
-    to_html()
+
+  
+ univariate_models_list %>%
+   purrr::map( add_reference_levels ) %>%
+   purrr::map( tidy_up_model_df     ) %>%
+   purrr::map( to_html              )
 
 }
 
+tidy_model
 
-model_to_html(list(model1))
+list(model1) %>%
+   purrr::map( add_reference_levels ) %>%
+   purrr::map( tidy_up_model_df     ) %>%
+   purrr::map( to_html              )
 
+
+model_to_html(list(model1)) -> htmloutput
+tempfile <- tempfile(pattern = "file", tmpdir = tempdir(), fileext = ".html")
+write_file( htmloutput[[1]], tempfile)
+utils::browseURL(tempfile)
+
+
+tidy_model <- add_reference_levels(model1)   %>% tidy_up_model_df()
+
+readr::write_file( htmloutput[[1]], "htmloutput.html")
+utils::browseURL("htmloutput.html")
+
+         css_matrix     <-
+        matrix(data = "padding-left: 0.5cm; padding-right: 0.5cm;",
+               nrow = nrow(table1),
+               ncol = ncol(table1))
+      css_matrix[, 1] <-
+        "padding-left: 0.4cm; padding-right: 0.3cm;"
+
+      htmlTable::htmlTable(
+        x =  table1,
+        rnames = FALSE,
+        cgroup   = c_group_vektor,
+        n.cgroup = n_c_group_vektor,
+        rgroup   = rgroup_vektor,
+        n.rgroup = n_rgroup_vektor,
+        align = alignment_vektor,
+        css.cell = css_matrix
+ 
+        
+        
 tidy_up_model_df(tidy_model)
 
 
@@ -91,8 +138,7 @@ format(round(x, 2), nsmall = 2)
 
 to_html(tidy_model) -> htmloutput
 
-readr::write_file( htmloutput, "htmloutput.html")
-utils::browseURL("htmloutput.html")
+
 
 
 htmlTable::htmlTable(
