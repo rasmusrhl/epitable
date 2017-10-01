@@ -14,20 +14,22 @@ library(purrr)
 
 library(tidyverse)
 
+univariate_models_list <-  list( glm_logistic, glm_logistic ) 
+univariate_models <- univariate_models_list
 
-model_to_html <- function( univariate_models_list, model_class = "coxph", simple = TRUE, decimals_estimate = 2 ) {
+model_to_html <- function( univariate_models_list, simple = TRUE, decimals_estimate = 2 ) {
 
-  if(  !class(univariate_models_list)=="list") {
-    stop ("univariate_models_list must be a list")
-  }
+  # if(  ! "list" %in% class(univariate_models_list) ) {
+  #   stop ("univariate_models_list must be a list")
+  # }
   
-  if(model_class == "coxph") {
-    purrr::map( univariate_models_list, class ) %>%
-     purrr::map( function(x) "coxph" %in% x ) %>%
-     unlist() %>%
-     all() -> are_all_models_coxph
-   if(! are_all_models_coxph ) stop ("When model_class is 'coxph' all models in univariate_models_list must be class 'coxph' ")
-  }
+  # if(model_class == "coxph") {
+  #   purrr::map( univariate_models_list, class ) %>%
+  #    purrr::map( function(x) "coxph" %in% x ) %>%
+  #    unlist() %>%
+  #    all() -> are_all_models_coxph
+  #  if(! are_all_models_coxph ) stop ("When model_class is 'coxph' all models in univariate_models_list must be class 'coxph' ")
+  # }
   
   
   tidy_up_model_df <- function(univariate_models) {
@@ -79,14 +81,28 @@ model_to_html <- function( univariate_models_list, model_class = "coxph", simple
 
 }
 
+broom::tidy( glm_logistic, conf.int = TRUE ) 
+broom::tidy( glm_linear, conf.int = TRUE  ) 
+broom::tidy( model1 )
+confint( glm_logistic)
+broom::tidy( model1, )
+
 tidy_model
 
 list(model1) %>%
    purrr::map( add_reference_levels ) %>%
    purrr::map( tidy_up_model_df     ) %>%
    purrr::map( to_html              )
+diamonds <- ggplot2::diamonds
+diamonds$color <- factor(diamonds$color, ordered = FALSE)
+diamonds$clarity <- factor(diamonds$clarity, ordered = FALSE)
+glm_logistic <- glm( cut=="Ideal" ~  color + clarity + x , data = diamonds, family = "binomial")
+
+glm_linear <- glm( Sepal.Width ~  Petal.Width + Species, data = iris)
 
 
+model_to_html(list(model1)) -> htmloutput
+model_to_html(list(glm_logistic)) -> htmloutput
 model_to_html(list(model1)) -> htmloutput
 tempfile <- tempfile(pattern = "file", tmpdir = tempdir(), fileext = ".html")
 write_file( htmloutput[[1]], tempfile)
@@ -154,7 +170,7 @@ htmlTable::htmlTable(
 )
 
 
-model_to_html( list(model1  ) ) -> tidy_model
+model_to_html( list(   ) ) -> tidy_model
 readr::write_file( tidy_model, "asdf.html")
 utils::browseURL("asdf.html")
 
@@ -178,7 +194,17 @@ df$sex     <- factor( df$sex)
 # single model
 model1      <- survival::coxph( survival::Surv( time = time, event = status==1) ~ age_bin + factor(sex) + ph_bin + wt.loss, data = df )
 
+diamonds <- ggplot2::diamonds
+diamonds$color <- factor(diamonds$color, ordered = FALSE)
+diamonds$clarity <- factor(diamonds$clarity, ordered = FALSE)
+glm_logistic <- glm( cut=="Ideal" ~  color + clarity + x , data = diamonds, family = "binomial")
+
+
+
 # model list
+
+model_list <- 
+
 model_list  <-  c("age_bin", "sex", "ph_bin" ) %>%
                     purrr::map( function(x) paste( "survival::Surv( time = time, event = status==1) ~ ", x ) ) %>%
                     purrr::map( function(x) survival::coxph( as.formula(x), data = df))
@@ -195,6 +221,10 @@ testthat::expect_error( model_to_html( univariate_models_list = "asdf") )
 
 # expect error if univariate_models_list contain not coxph element
 testthat::expect_error( model_to_html( univariate_models_list = model_list_with_extra ))
+
+# expect error if covariates are of class "ordered"# test ordered model
+testthat::expect_error( model_to_html( glm_logistic <- glm( cut=="Ideal" ~  color + clarity + x , data = ggplot2::diamonds, family = "binomial")))
+
 } )
 
 

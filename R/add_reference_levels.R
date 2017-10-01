@@ -29,9 +29,14 @@
 # add_reference_levels(glm2)
 # add_reference_levels(glm1)
 
+
+add_reference_levels(glm_logistic)
+model_object <- glm_logistic
+
+
 add_reference_levels <- function( model_object, exponentiate = FALSE  ) {
   
-    if ("ordered" %in% attr(model1$terms, "dataclasses")) {
+    if ("ordered" %in% attr(model_object$terms, "dataClasses")) {
        stop ("add_reference_levels() does not support ordered factors in the model object. Check the class of the covariates in the model and ensure that they are not class 'ordered' ")
     }
       
@@ -93,4 +98,9 @@ add_reference_levels <- function( model_object, exponentiate = FALSE  ) {
 # glm_logistic <- glm( cut=="Ideal" ~  color + clarity + x , data = diamonds, family = "binomial")
 # 
 # glm_linear <- glm( Sepal.Width ~  Petal.Width + Species, data = iris)
+
+# test ordered model
+glm_logistic <- glm( cut=="Ideal" ~  color + clarity + x , data = ggplot2::diamonds, family = "binomial")
+
+
 
