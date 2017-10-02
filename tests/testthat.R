@@ -55,10 +55,13 @@ stringr::str_pad( string = as.character(format( round( c(-0.12, 0.2, -1.2),2 ),n
 
 # model_to_html(univariate_models_list = glm_linear) -> htmloutput
 model_to_html(univariate_models_list = glm_logistic, exponentiate = TRUE) -> htmloutput
-
+serif <- "font-family: Serif;"  # same as times
+arial <- "font-family: Arial;"
 model_to_html(univariate_models_list = model1,
-              exponentiate = TRUE ) -> htmloutput
+              exponentiate = FALSE, font_css = "font-family: monospace;" ) -> htmloutput
 tempfile <- tempfile(pattern = "file", tmpdir = tempdir(), fileext = ".html")
 readr::write_file( htmloutput[[1]], tempfile)
 utils::browseURL(tempfile)
+
+
 

@@ -41,7 +41,7 @@ The `model_to_html`-function can print simple models to HTML, also printing the 
  df$ph_bin  <- Hmisc::cut2( df$ph.karno, g = 5)
  df$sex     <- factor( df$sex)
  model1      <- survival::coxph( survival::Surv( time = time, event = status==1) ~ age_bin + factor(sex) + ph_bin + wt.loss, data = df )
-
+ 
  model_to_html(model1, exponentiate = TRUE )
 ```
 
