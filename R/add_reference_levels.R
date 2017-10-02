@@ -17,8 +17,8 @@
 #' # Model for which I want reference levels printed in the output.
 #' lung <- survival::lung
 #' lung$species <- iris$Species[ sample.int( 150, 228, replace = TRUE )]
-#' input_to_function <- survival::coxph( survival::Surv( time, status == 2 ) ~ age +
-#' sex  + ph.karno + wt.loss + species, data =  lung)
+#' input_to_function <- survival::coxph( survival::Surv( time, status == 2 ) ~
+#' age + sex  + ph.karno + wt.loss + species, data =  lung)
 #' add_reference_levels( model_object = input_to_function)
 
 

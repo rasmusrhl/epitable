@@ -3,6 +3,7 @@
 export(add_reference_levels)
 export(freq_by)
 export(model_to_html)
+import(ggplot2)
 import(rlang)
 import(survival)
 import(tidyverse)

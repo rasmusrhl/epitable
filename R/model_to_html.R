@@ -5,10 +5,10 @@
 #' @param univariate_models_list List of univariate models
 #' @param decimals_estimate A number specifying decimals on estimates. Default is 2.
 #' @importFrom Hmisc cut2
+#' @import ggplot2 survival
 #' @export model_to_html
 #' @examples
-#' library(survival)
-#' df         <- lung
+#' df         <- survival::lung
 #' df$age_bin <- Hmisc::cut2( df$age, g = 5)
 #' df$ph_bin  <- Hmisc::cut2( df$ph.karno, g = 5)
 #' df$sex     <- factor( df$sex)
@@ -21,7 +21,7 @@
 #' glm_linear       <- glm( Sepal.Width ~  Petal.Width + Species, data = iris)
 
 
-model_to_html <- function( univariate_models_list, simple = TRUE, decimals_estimate = 2 ) {
+model_to_html <- function( univariate_models_list, decimals_estimate = 2 ) {
 
   if(  ! "list" %in% class(univariate_models_list) ) { # input must be list dont know why
     univariate_models_list <- list(univariate_models_list)
