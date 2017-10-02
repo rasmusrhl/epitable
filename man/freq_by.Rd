@@ -5,7 +5,7 @@
 \title{Frequencies and percentages}
 \usage{
 freq_by(dataset, var_vector, by_group = NULL, include_total = TRUE,
-  htmlout = TRUE)
+  htmlout = TRUE, font_css = "font-family: monospace;")
 }
 \arguments{
 \item{dataset}{A dataset}
@@ -21,6 +21,9 @@ frequencies and percentages, i.e. not stratified by the \code{by_group}.}
 
 \item{htmlout}{Whether to output to html (default and intended usage), or
 as r-dataframe.}
+
+\item{font_css}{A string of CSS code defining the font used for the table.
+Default is'font-family: monospace;'.}
 }
 \description{
 \code{freq_by} creates frequency and percentage tables in HTML.

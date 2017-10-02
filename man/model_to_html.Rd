@@ -4,13 +4,20 @@
 \alias{model_to_html}
 \title{Print regression models to HTML}
 \usage{
-model_to_html(univariate_models_list, decimals_estimate = 2,
-  exponentiate = FALSE)
+model_to_html(univariate_models_list, multivariate_models_list,
+  decimals_estimate = 2, exponentiate = FALSE,
+  font_css = "font-family: monospace;")
 }
 \arguments{
 \item{univariate_models_list}{List of univariate models}
 
+\item{multivariate_models_list}{List of univariate models}
+
 \item{decimals_estimate}{A number specifying decimals on estimates. Default is 2.}
+
+\item{font_css}{A string of CSS code defining the font used for the table. Default is
+'font-family: monospace;'. A monospace font necessary for perfect
+alignment of table cells. Another option:'font-family: "Courier New";'}
 }
 \description{
 Prints on or more lists of regression models to HTML. Currently
