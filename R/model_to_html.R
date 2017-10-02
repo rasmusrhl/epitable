@@ -5,7 +5,7 @@
 #' @param univariate_models_list List of univariate models
 #' @param decimals_estimate A number specifying decimals on estimates. Default is 2.
 #' @importFrom Hmisc cut2
-#' @import ggplot2 survival
+#' @import survival
 #' @export model_to_html
 #' @examples
 #' df         <- survival::lung
@@ -14,7 +14,7 @@
 #' df$sex     <- factor( df$sex)
 #' model1     <- survival::coxph( survival::Surv( time = time, event = status==1) ~ age_bin + factor(sex) + ph_bin + wt.loss, data = df )
 #'
-#' diamonds         <- ggplot2::diamonds
+#' diamonds         <- example_data
 #' diamonds$color   <- factor(diamonds$color, ordered = FALSE)
 #' diamonds$clarity <- factor(diamonds$clarity, ordered = FALSE)
 #' glm_logistic     <- glm( cut=="Ideal" ~  color + clarity + x , data = diamonds, family = "binomial")
