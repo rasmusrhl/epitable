@@ -12,7 +12,7 @@
 #' df$age_bin <- Hmisc::cut2( df$age, g = 5)
 #' df$ph_bin  <- Hmisc::cut2( df$ph.karno, g = 5)
 #' df$sex     <- factor( df$sex)
-#' model1     <- survival::coxph( survival::Surv( time = time, event = status==1) ~ age_bin + factor(sex) + ph_bin + wt.loss, data = df )
+#' model1     <- survival::coxph( survival::Surv( time , status==1) ~ ph_bin + wt.loss, data = df)
 #'
 #' diamonds         <- example_data
 #' diamonds$color   <- factor(diamonds$color, ordered = FALSE)
