@@ -17,7 +17,8 @@ Depends:
 Imports:
     tidyverse (>= 1.1.1),
     broom (>= 0.4.2),
-    dplyr (>= 0.7), 
+    dplyr (>= 0.7),
+    Hmisc (>= 4.0-3), 
     htmlTable (>= 1.9), 
     purrr (>= 0.2.3), 
     rlang (>= 0.1.2), 
