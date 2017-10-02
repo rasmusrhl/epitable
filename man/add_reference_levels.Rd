@@ -4,20 +4,24 @@
 \alias{add_reference_levels}
 \title{Add reference levels}
 \usage{
-add_reference_levels(model_object)
+add_reference_levels(model_object, exponentiate = FALSE)
 }
 \arguments{
 \item{model_object}{A cox.ph object}
+
+\item{exponentiate}{defaults to NULL. Is set to FALSE if model input is class
+glm or lm, and is set to TRUE if model is class coxph.}
 }
 \description{
 \code{add_reference_levels} Adds reference levels to regression
     model object
 }
 \details{
-Prints summary statistics of cox.ph model using the
-    \code{broom}-package, and adds a reference level to the
-    categorical predictors, as is commonly used in epidemiological
-    publications.
+Prints summary statistics of models of class \code{coxph} or
+    \code{glm} using the \code{broom}-package, and adds a reference
+    level to the categorical predictors, as is commonly used in
+    epidemiological publications. Does not support models with interactions
+    or covariates of class \code{ordered}.
 }
 \examples{
 # Model for which I want reference levels printed in the output.

@@ -5,10 +5,11 @@
 #' @param model_object A cox.ph object
 #' @param exponentiate defaults to NULL. Is set to FALSE if model input is class
 #'     glm or lm, and is set to TRUE if model is class coxph.
-#' @details Prints summary statistics of cox.ph model using the
-#'     \code{broom}-package, and adds a reference level to the
-#'     categorical predictors, as is commonly used in epidemiological
-#'     publications.
+#' @details Prints summary statistics of models of class \code{coxph} or
+#'     \code{glm} using the \code{broom}-package, and adds a reference
+#'     level to the categorical predictors, as is commonly used in
+#'     epidemiological publications. Does not support models with interactions
+#'     or covariates of class \code{ordered}.
 #' @export add_reference_levels
 #' @import survival tidyverse rlang
 #' @importFrom dplyr "%>%"
@@ -20,37 +21,26 @@
 #' sex  + ph.karno + wt.loss + species, data =  lung)
 #' add_reference_levels( model_object = input_to_function)
 
-# model_object <- glm_logistic
-# glm_logistic$coefficients
-# str(glm_logistic)
-# glm_linear
-# glm_logistic
-# model1
-# add_reference_levels(glm2)
-# add_reference_levels(glm1)
 
-
-add_reference_levels(glm_logistic)
-model_object <- glm_logistic
 
 
 add_reference_levels <- function( model_object, exponentiate = FALSE  ) {
-  
+
     if ("ordered" %in% attr(model_object$terms, "dataClasses")) {
        stop ("add_reference_levels() does not support ordered factors in the model object. Check the class of the covariates in the model and ensure that they are not class 'ordered' ")
     }
-      
+    # in future maybe make implement autochoice of exponentiate if exponentiate is NULL.
     # if ( "coxph" %in% class(model_object) & is.null(exponentiate) ) {
     #  exponentiate <- TRUE     } else if ( model_object$family$link %in% "logit" & is.null(exponentiate ) {
     #  exponentiate <- TRUE
-    #   } 
+    #   }
 
 
     # extract pretty categorical variables (used for presentation, including ref category)
     cat_variables_n_l      <-  model_object$xlevels
     cat_variables_n        <-  names( cat_variables_n_l )
-    cat_variables_l        <-  map_dbl(cat_variables_n_l,   length )
-    cat_variables_output   <-  map2( cat_variables_n, cat_variables_l, .f = function(x,y ) rep( x, each = y)) %>% unlist()
+    cat_variables_l        <-  purrr::map_dbl(cat_variables_n_l,   length )
+    cat_variables_output   <-  purrr::map2( cat_variables_n, cat_variables_l, .f = function(x,y ) rep( x, each = y)) %>% unlist()
 
 
     # extract pretty categorical categories (used for presentation)
@@ -68,7 +58,7 @@ add_reference_levels <- function( model_object, exponentiate = FALSE  ) {
 
     # create terms column in style of model output (used for join)
 
-    term_column_categoric  <- map2( cat_variables_n, cat_variables_n_l, function(x,y) paste0(x,y )  )  %>% unlist()
+    term_column_categoric  <- purrr::map2( cat_variables_n, cat_variables_n_l, function(x,y) paste0(x,y )  )  %>% unlist()
 
 
     left_column            <-  data.frame( term = c( term_column_categoric, term_column_numeric ) )
@@ -80,8 +70,12 @@ add_reference_levels <- function( model_object, exponentiate = FALSE  ) {
 
 
     # the full covariate list is left joined with the statistical values
-    
-    tidy_model_output          <- broom::tidy(model_object, exponentiate =  exponentiate )
+    if (  "glm" %in% class(model_object)) {
+     tidy_model_output <- broom::tidy( model_object, exponentiate = exponentiate, conf.int = TRUE)
+    } else if ( "coxph" %in% class(model_object)) {
+     tidy_model_output <- broom::tidy( model_object, exponentiate = exponentiate )
+    }
+
     suppressWarnings( dplyr::left_join( left_column, tidy_model_output, "term" ) ) -> add_ref_output
     add_ref_output
 
@@ -91,12 +85,12 @@ add_reference_levels <- function( model_object, exponentiate = FALSE  ) {
 # test
 # add_reference_levels(model1)
 # add_reference_levels(glm_logistic, exponentiate = TRUE)
-# 
+#
 # diamonds <- ggplot2::diamonds
 # diamonds$color <- factor(diamonds$color, ordered = FALSE)
 # diamonds$clarity <- factor(diamonds$clarity, ordered = FALSE)
 # glm_logistic <- glm( cut=="Ideal" ~  color + clarity + x , data = diamonds, family = "binomial")
-# 
+#
 # glm_linear <- glm( Sepal.Width ~  Petal.Width + Species, data = iris)
 
 # test ordered model
