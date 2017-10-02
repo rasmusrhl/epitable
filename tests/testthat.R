@@ -13,7 +13,7 @@
  model1      <- survival::coxph( survival::Surv( time = time, event = status==1) ~ age_bin + factor(sex) + ph_bin + wt.loss, data = df )
 
 
-
+ model_to_html(model1)
 
  diamonds <- ggplot2::diamonds
  diamonds$color <- factor(diamonds$color, ordered = FALSE)
@@ -21,19 +21,56 @@
  glm_logistic <- glm( cut=="Ideal" ~  color + clarity + x , data = diamonds, family = "binomial")
  glm_linear <- glm( Sepal.Width ~  Petal.Width + Species, data = iris)
 
-decimals_estimate <- 2
 
 epitable:::model_gets_ref_levels(glm_linear)  %>%
 epitable:::model_gets_formatted_numbers()
 
 model_to_html(univariate_models_list = glm_logistic, exponentiate = TRUE )
-model_to_html(univariate_models_list = glm_linear)
-model_to_html(univariate_models_list = model1)
+model_to_html(univariate_models_list = model1, exponentiate = TRUE )
 
-model_to_html((model1)) -> htmloutput
 model_to_html(glm_logistic, exponentiate = TRUE) -> htmloutput
-model_to_html((model1)) -> htmloutput
+model_to_html(glm_linear, exponentiate = TRUE) -> htmloutput
+
+model_to_html(univariate_models_list = glm_linear)
+model_to_html(univariate_models_list = glm_logistic)
+
+model_to_html(univariate_models_list = glm_linear) -> htmloutput
+model_to_html(univariate_models_list = glm_logistic) -> htmloutput
+
+
+model_to_html((model1), exponentiate = FALSE) -> htmloutput
+
+df1 <- data.frame( test = paste0( c(-0.12, 0.20, -1.2), ", ", c(-0.12, 0.20, -1.2) ) )
+
+paste0( "[",
+stringr::str_pad( string = as.character(format( round( c(-0.12, 0.2, -1.2),2 ),nsmall=2)), width = 5,
+                  side = "left" ),
+        ",",
+stringr::str_pad( string = as.character(format( round( c(-0.12, 0.2, -1.2),2 ),nsmall=2)), width = 5,
+                  side = "left" ),
+        "]"  )
+
+
+paste0( "[",
+stringr::str_pad( string = as.character(format( round( estimate, decimals_estimate ),nsmall=2)), width = 5,
+                  side = "left" ),
+        ",",
+stringr::str_pad( string = as.character(format( round( estimate, decimals_estimate ),nsmall=2)), width = 5,
+                  side = "left" ),
+        "]"  )
+
+
+stringr::str_pad( string = as.character(format( round( c(-0.12, 0.2, -1.2),2 ),nsmall=2)), width = 5,
+                  side = "left" )
+
+
+
+
+         width =
+
+htmloutput <- htmlTable::htmlTable( x = df1, , align = "r", rnames = FALSE )
 tempfile <- tempfile(pattern = "file", tmpdir = tempdir(), fileext = ".html")
 readr::write_file( htmloutput[[1]], tempfile)
 utils::browseURL(tempfile)
 
+stringr::str_pad

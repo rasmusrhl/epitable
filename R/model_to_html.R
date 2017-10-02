@@ -3,6 +3,7 @@
 #' @description Prints on or more lists of regression models to HTML. Currently
 #'     only works with class coxph.
 #' @param univariate_models_list List of univariate models
+#' @param multivariate_models_list List of univariate models
 #' @param decimals_estimate A number specifying decimals on estimates. Default is 2.
 #' @importFrom Hmisc cut2
 #' @importFrom dplyr "%>%"
@@ -21,10 +22,7 @@
 #' glm_logistic     <- glm( cut=="Ideal" ~  color + clarity + x , data = diamonds, family = "binomial")
 #' glm_linear       <- glm( Sepal.Width ~  Petal.Width + Species, data = iris)
 
-
-model_to_html <- function( univariate_models_list, decimals_estimate = 2, exponentiate = FALSE ) {
-
-
+model_to_html <- function( univariate_models_list, multivariate_models_list, decimals_estimate = 2, exponentiate = FALSE ) {
 
 # Check input -------------------------------------------------------------
 
@@ -40,9 +38,7 @@ model_to_html <- function( univariate_models_list, decimals_estimate = 2, expone
   #  if(! are_all_models_coxph ) stop ("When model_class is 'coxph' all models in univariate_models_list must be class 'coxph' ")
   # }
 
-
 # Internal functions are defined ------------------------------------------
-
 
   model_gets_ref_levels        <- function( model_object      ) {
 
@@ -71,6 +67,10 @@ model_to_html <- function( univariate_models_list, decimals_estimate = 2, expone
     term_column_numeric    <- names( attr( model_object$terms, "dataClasses" )[
                                    attr( model_object$terms, "dataClasses" )  == "numeric"  ]  )
 
+    # This lines removes any term which is not in coefficients. Otherwise the outcome
+    # variable may be included in the list of covariates.
+    term_column_numeric    <- term_column_numeric[ term_column_numeric %in% names(model_object$coefficients) ]
+
     pretty_variables       <- c( cat_variables_output, term_column_numeric )
     pretty_categories      <- c( cat_categories, term_column_numeric )
     column_type            <- c( rep( "char_or_factor", length(cat_variables_output ) ),
@@ -85,42 +85,62 @@ model_to_html <- function( univariate_models_list, decimals_estimate = 2, expone
     left_column$variables  <-  pretty_variables
     left_column$categories <-  pretty_categories
     left_column$type       <-  column_type
+    left_column$class      <-  paste0( class(model_object), sep = "", collapse = " " )
     left_column$n          <-  if ( "coxph" %in% class(model_object)) model_object$n else {
                                 if ( "glm" %in% class(model_object)) nrow( model_object$model) }
 
+    if ( "coxph" %in% class(model_object)) {
+    left_column$estimate_name  <- "HR"
+    } else if ("binomial" %in%  model_object$family ) {
+    left_column$estimate_name  <- "OR"
+    } else {
+    left_column$estimate_name  <- "&beta;"
+    }
 
     # the full covariate list is left joined with the statistical values
     if (  "glm" %in% class(model_object)) {
-     tidy_model_output <- broom::tidy( model_object, exponentiate = exponentiate, conf.int = TRUE)
+     model_with_ref <- broom::tidy( model_object, exponentiate = exponentiate, conf.int = TRUE)
     } else if ( "coxph" %in% class(model_object)) {
-     tidy_model_output <- broom::tidy( model_object, exponentiate = exponentiate )
+     model_with_ref <- broom::tidy( model_object, exponentiate = exponentiate )
+    } else {
+     model_with_ref <- broom::tidy( model_object ); print("Model class not detected")
     }
 
-    suppressWarnings( dplyr::left_join( left_column, tidy_model_output, "term" ) ) -> add_ref_output
-    add_ref_output
+    suppressWarnings( dplyr::left_join( left_column, model_with_ref, "term" ) ) -> model_with_ref
+    model_with_ref
 
-}
+  }
+  model_gets_formatted_numbers <- function( output_from_ref_fun ) {
 
 
-  model_gets_formatted_numbers <- function( univariate_models ) {
-    univariate_models %>%
+    output_from_ref_fun %>%
       dplyr::transmute( variables,
                  categories,
                  estimate = format( round( estimate, decimals_estimate ), nsmall = decimals_estimate),
-                 CI = paste0( "[",
-                              format( round( conf.low,  decimals_estimate ), nsmall = decimals_estimate),
-                              ", ",
-                              format( round( conf.high, decimals_estimate ), nsmall = decimals_estimate ),
-                              "]" )
-                 )  -> tidy_model
+                 CI       = paste0( "[",
+                                    stringr::str_pad( string = as.character(
+                                        format( round( conf.low, decimals_estimate ), nsmall=2)), width = 5, side = "left" ),
+                                    ",",
+                                    stringr::str_pad( string = as.character(
+                                        format( round( conf.high, decimals_estimate ),nsmall=2)), width = 5, side = "left" ),
+                                    "]"
+                                  )
+                      )  -> tidy_model
 
+    if (output_from_ref_fun$estimate_name[1] %in% c("HR", "OR")) {
     tidy_model$estimate[ stringr::str_detect(  string = tidy_model$estimate,  pattern =  "NA") ] <- "1"
+    } else {
+    tidy_model$estimate[ stringr::str_detect(  string = tidy_model$estimate,  pattern =  "NA") ] <- "Ref"
+    }
+
     tidy_model$CI[ stringr::str_detect(  string = tidy_model$CI,  pattern =  "NA") ]             <- "Ref"
+
+
+
+    names(tidy_model)[ names(tidy_model)=="estimate" ]  <- output_from_ref_fun$estimate_name[1]
 
     tidy_model
   }
-
-
   model_becomes_html           <- function( tidy_model        ) {
 
     rgroup_vector       <-   stringr::str_to_title( rle(tidy_model$variables)$values )
@@ -134,7 +154,7 @@ model_to_html <- function( univariate_models_list, decimals_estimate = 2, expone
                               ncol = ncol(tidy_model))
     css_matrix[, 1] <- "padding-left: 0.4cm; padding-right: 0.3cm;"
 
-    htmlTable::htmlTable(
+     htmlTable::htmlTable(
      x          = tidy_model ,
      rnames     = FALSE,
      rgroup     = rgroup_vector,
@@ -145,9 +165,7 @@ model_to_html <- function( univariate_models_list, decimals_estimate = 2, expone
     )
   }
 
-
 # combine functions -------------------------------------------------------
-
 
  univariate_models_list %>%
    purrr::map( model_gets_ref_levels            ) %>%
