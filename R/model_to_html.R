@@ -22,7 +22,11 @@
 #' glm_linear       <- glm( Sepal.Width ~  Petal.Width + Species, data = iris)
 
 
-model_to_html <- function( univariate_models_list, decimals_estimate = 2, exponetiate = FALSE ) {
+model_to_html <- function( univariate_models_list, decimals_estimate = 2, exponentiate = FALSE ) {
+
+
+
+# Check input -------------------------------------------------------------
 
   if(  ! "list" %in% class(univariate_models_list) ) { # input must be list dont know why
     univariate_models_list <- list(univariate_models_list)
@@ -37,10 +41,118 @@ model_to_html <- function( univariate_models_list, decimals_estimate = 2, expone
   # }
 
 
+# Internal functions are defined ------------------------------------------
+
+
+  model_gets_ref_levels        <- function( model_object      ) {
+
+    if ("ordered" %in% attr(model_object$terms, "dataClasses")) {
+       stop ("add_reference_levels() does not support ordered factors in the model object. Check the class of the covariates in the model and ensure that they are not class 'ordered' ")
+    }
+    # in future maybe make implement autochoice of exponentiate if exponentiate is NULL.
+    # if ( "coxph" %in% class(model_object) & is.null(exponentiate) ) {
+    #  exponentiate <- TRUE     } else if ( model_object$family$link %in% "logit" & is.null(exponentiate ) {
+    #  exponentiate <- TRUE
+    #   }
+
+
+    # extract pretty categorical variables (used for presentation, including ref category)
+    cat_variables_n_l      <-  model_object$xlevels
+    cat_variables_n        <-  names( cat_variables_n_l )
+    cat_variables_l        <-  purrr::map_dbl(cat_variables_n_l,   length )
+    cat_variables_output   <-  purrr::map2( cat_variables_n, cat_variables_l, .f = function(x,y ) rep( x, each = y)) %>% unlist()
+
+
+    # extract pretty categorical categories (used for presentation)
+    cat_categories         <- model_object$xlevels %>% unlist() %>% as.character()
+
+    # combine pretty categorical variables and numeric variables
+
+    term_column_numeric    <- names( attr( model_object$terms, "dataClasses" )[
+                                   attr( model_object$terms, "dataClasses" )  == "numeric"  ]  )
+
+    pretty_variables       <- c( cat_variables_output, term_column_numeric )
+    pretty_categories      <- c( cat_categories, term_column_numeric )
+    column_type            <- c( rep( "char_or_factor", length(cat_variables_output ) ),
+                                 rep( "numeric"       , length( term_column_numeric ) ) )
+
+    # create terms column in style of model output (used for join)
+
+    term_column_categoric  <- purrr::map2( cat_variables_n, cat_variables_n_l, function(x,y) paste0(x,y )  )  %>% unlist()
+
+
+    left_column            <-  data.frame( term = c( term_column_categoric, term_column_numeric ) )
+    left_column$variables  <-  pretty_variables
+    left_column$categories <-  pretty_categories
+    left_column$type       <-  column_type
+    left_column$n          <-  if ( "coxph" %in% class(model_object)) model_object$n else {
+                                if ( "glm" %in% class(model_object)) nrow( model_object$model) }
+
+
+    # the full covariate list is left joined with the statistical values
+    if (  "glm" %in% class(model_object)) {
+     tidy_model_output <- broom::tidy( model_object, exponentiate = exponentiate, conf.int = TRUE)
+    } else if ( "coxph" %in% class(model_object)) {
+     tidy_model_output <- broom::tidy( model_object, exponentiate = exponentiate )
+    }
+
+    suppressWarnings( dplyr::left_join( left_column, tidy_model_output, "term" ) ) -> add_ref_output
+    add_ref_output
+
+}
+
+
+  model_gets_formatted_numbers <- function( univariate_models ) {
+    univariate_models %>%
+      dplyr::transmute( variables,
+                 categories,
+                 estimate = format( round( estimate, decimals_estimate ), nsmall = decimals_estimate),
+                 CI = paste0( "[",
+                              format( round( conf.low,  decimals_estimate ), nsmall = decimals_estimate),
+                              ", ",
+                              format( round( conf.high, decimals_estimate ), nsmall = decimals_estimate ),
+                              "]" )
+                 )  -> tidy_model
+
+    tidy_model$estimate[ stringr::str_detect(  string = tidy_model$estimate,  pattern =  "NA") ] <- "1"
+    tidy_model$CI[ stringr::str_detect(  string = tidy_model$CI,  pattern =  "NA") ]             <- "Ref"
+
+    tidy_model
+  }
+
+
+  model_becomes_html           <- function( tidy_model        ) {
+
+    rgroup_vector       <-   stringr::str_to_title( rle(tidy_model$variables)$values )
+    n_rgroup_vector     <-   rle(tidy_model$variables)$lengths
+    rgroup_vector[ n_rgroup_vector == 1 ]   <- "&nbsp;" # single rows dont need rgroup header
+
+    css_rgroup      <- "font-style: italic;padding-top: 0.4cm;padding-right: 0.4cm;padding-bottom: 0.2cm;"
+    tidy_model      <- tidy_model[,-1]
+    css_matrix      <- matrix(data = "padding-left: 0.5cm; padding-right: 0.5cm;",
+                              nrow = nrow(tidy_model),
+                              ncol = ncol(tidy_model))
+    css_matrix[, 1] <- "padding-left: 0.4cm; padding-right: 0.3cm;"
+
+    htmlTable::htmlTable(
+     x          = tidy_model ,
+     rnames     = FALSE,
+     rgroup     = rgroup_vector,
+     n.rgroup   = n_rgroup_vector,
+     align      = c("l","r"),
+     css.rgroup = css_rgroup,
+     css.cell   = css_matrix
+    )
+  }
+
+
+# combine functions -------------------------------------------------------
+
+
  univariate_models_list %>%
-   purrr::map( epitable:::model_gets_ref_levels ) %>%
-   purrr::map( epitable:::model_gets_formatted_numbers     ) %>%
-   purrr::map( epitable:::model_becomes_html              )
+   purrr::map( model_gets_ref_levels            ) %>%
+   purrr::map( model_gets_formatted_numbers     ) %>%
+   purrr::map( model_becomes_html               )
 
 }
 

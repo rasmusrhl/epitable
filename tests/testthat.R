@@ -26,13 +26,13 @@ decimals_estimate <- 2
 epitable:::model_gets_ref_levels(glm_linear)  %>%
 epitable:::model_gets_formatted_numbers()
 
-model_to_html(univariate_models_list = glm_logistic)
+model_to_html(univariate_models_list = glm_logistic, exponentiate = TRUE )
 model_to_html(univariate_models_list = glm_linear)
 model_to_html(univariate_models_list = model1)
 
-model_to_html(list(model1)) -> htmloutput
-model_to_html(list(glm_logistic)) -> htmloutput
-model_to_html(list(model1)) -> htmloutput
+model_to_html((model1)) -> htmloutput
+model_to_html(glm_logistic, exponentiate = TRUE) -> htmloutput
+model_to_html((model1)) -> htmloutput
 tempfile <- tempfile(pattern = "file", tmpdir = tempdir(), fileext = ".html")
 readr::write_file( htmloutput[[1]], tempfile)
 utils::browseURL(tempfile)
