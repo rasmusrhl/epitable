@@ -4,7 +4,7 @@
 \alias{model_becomes_html}
 \title{Model becomes HTML}
 \usage{
-model_becomes_html(tidy_model)
+model_becomes_html(tidy_model, env = parent.frame())
 }
 \arguments{
 \item{tidy_model}{A dataframe.}

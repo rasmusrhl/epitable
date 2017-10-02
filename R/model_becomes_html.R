@@ -2,11 +2,12 @@
 #'
 #' @description Takes as input the output from \code{model_gets_formatted_numbers}.
 #' @param tidy_model A dataframe.
+#' @importFrom dplyr "%>%"
 #' @keywords internal
 
 
 
-  model_becomes_html <- function(tidy_model) {
+  model_becomes_html <- function(tidy_model, env = parent.frame() ) {
 
     rgroup_vector       <-   stringr::str_to_title( rle(tidy_model$variables)$values )
     n_rgroup_vector     <-   rle(tidy_model$variables)$lengths

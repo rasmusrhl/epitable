@@ -4,7 +4,7 @@
 \alias{model_gets_ref_levels}
 \title{Add reference levels}
 \usage{
-model_gets_ref_levels(model_object, exponentiate = FALSE)
+model_gets_ref_levels(model_object, env = parent.frame())
 }
 \arguments{
 \item{model_object}{A cox.ph object}

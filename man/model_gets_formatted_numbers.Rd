@@ -4,7 +4,7 @@
 \alias{model_gets_formatted_numbers}
 \title{Model becomes HTML}
 \usage{
-model_gets_formatted_numbers(univariate_models)
+model_gets_formatted_numbers(univariate_models, env = parent.frame())
 }
 \arguments{
 \item{tidy_model}{A dataframe.}

@@ -4,7 +4,8 @@
 \alias{model_to_html}
 \title{Print regression models to HTML}
 \usage{
-model_to_html(univariate_models_list, decimals_estimate = 2)
+model_to_html(univariate_models_list, decimals_estimate = 2,
+  exponetiate = FALSE)
 }
 \arguments{
 \item{univariate_models_list}{List of univariate models}

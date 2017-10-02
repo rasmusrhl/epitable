@@ -5,6 +5,7 @@
 #' @param univariate_models_list List of univariate models
 #' @param decimals_estimate A number specifying decimals on estimates. Default is 2.
 #' @importFrom Hmisc cut2
+#' @importFrom dplyr "%>%"
 #' @import survival
 #' @export model_to_html
 #' @examples
@@ -21,7 +22,7 @@
 #' glm_linear       <- glm( Sepal.Width ~  Petal.Width + Species, data = iris)
 
 
-model_to_html <- function( univariate_models_list, decimals_estimate = 2 ) {
+model_to_html <- function( univariate_models_list, decimals_estimate = 2, exponetiate = FALSE ) {
 
   if(  ! "list" %in% class(univariate_models_list) ) { # input must be list dont know why
     univariate_models_list <- list(univariate_models_list)
@@ -36,11 +37,10 @@ model_to_html <- function( univariate_models_list, decimals_estimate = 2 ) {
   # }
 
 
-
  univariate_models_list %>%
-   purrr::map( add_reference_levels ) %>%
-   purrr::map( tidy_up_model_df     ) %>%
-   purrr::map( to_html              )
+   purrr::map( epitable:::model_gets_ref_levels ) %>%
+   purrr::map( epitable:::model_gets_formatted_numbers     ) %>%
+   purrr::map( epitable:::model_becomes_html              )
 
 }
 

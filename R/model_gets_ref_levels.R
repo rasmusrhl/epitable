@@ -24,7 +24,7 @@
 
 
 
-model_gets_ref_levels <- function( model_object, exponentiate = FALSE  ) {
+model_gets_ref_levels <- function( model_object, env = parent.frame() ) {
 
     if ("ordered" %in% attr(model_object$terms, "dataClasses")) {
        stop ("add_reference_levels() does not support ordered factors in the model object. Check the class of the covariates in the model and ensure that they are not class 'ordered' ")
