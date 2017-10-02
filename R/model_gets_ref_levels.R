@@ -10,7 +10,7 @@
 #'     level to the categorical predictors, as is commonly used in
 #'     epidemiological publications. Does not support models with interactions
 #'     or covariates of class \code{ordered}.
-#' @export add_reference_levels
+#' @keywords internal
 #' @import survival tidyverse rlang
 #' @importFrom dplyr "%>%"
 #' @examples
