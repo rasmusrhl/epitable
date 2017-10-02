@@ -34,7 +34,6 @@ model_to_html(glm_linear, exponentiate = TRUE) -> htmloutput
 model_to_html(univariate_models_list = glm_linear)
 model_to_html(univariate_models_list = glm_logistic)
 
-model_to_html(univariate_models_list = glm_linear) -> htmloutput
 model_to_html(univariate_models_list = glm_logistic) -> htmloutput
 
 
@@ -51,26 +50,15 @@ stringr::str_pad( string = as.character(format( round( c(-0.12, 0.2, -1.2),2 ),n
         "]"  )
 
 
-paste0( "[",
-stringr::str_pad( string = as.character(format( round( estimate, decimals_estimate ),nsmall=2)), width = 5,
-                  side = "left" ),
-        ",",
-stringr::str_pad( string = as.character(format( round( estimate, decimals_estimate ),nsmall=2)), width = 5,
-                  side = "left" ),
-        "]"  )
-
-
-stringr::str_pad( string = as.character(format( round( c(-0.12, 0.2, -1.2),2 ),nsmall=2)), width = 5,
-                  side = "left" )
 
 
 
+# model_to_html(univariate_models_list = glm_linear) -> htmloutput
+model_to_html(univariate_models_list = glm_logistic, exponentiate = TRUE) -> htmloutput
 
-         width =
-
-htmloutput <- htmlTable::htmlTable( x = df1, , align = "r", rnames = FALSE )
+model_to_html(univariate_models_list = model1,
+              exponentiate = TRUE ) -> htmloutput
 tempfile <- tempfile(pattern = "file", tmpdir = tempdir(), fileext = ".html")
 readr::write_file( htmloutput[[1]], tempfile)
 utils::browseURL(tempfile)
 
-stringr::str_pad

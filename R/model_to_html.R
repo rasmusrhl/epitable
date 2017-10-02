@@ -5,6 +5,9 @@
 #' @param univariate_models_list List of univariate models
 #' @param multivariate_models_list List of univariate models
 #' @param decimals_estimate A number specifying decimals on estimates. Default is 2.
+#' @param font_css A string of CSS code defining the font used for the table. Default is
+#'     'font-family: monospace;'. A monospace font necessary for perfect
+#'     alignment of table cells. Another option:'font-family: "Courier New";'
 #' @importFrom Hmisc cut2
 #' @importFrom dplyr "%>%"
 #' @import survival
@@ -22,7 +25,8 @@
 #' glm_logistic     <- glm( cut=="Ideal" ~  color + clarity + x , data = diamonds, family = "binomial")
 #' glm_linear       <- glm( Sepal.Width ~  Petal.Width + Species, data = iris)
 
-model_to_html <- function( univariate_models_list, multivariate_models_list, decimals_estimate = 2, exponentiate = FALSE ) {
+model_to_html <- function( univariate_models_list, multivariate_models_list, decimals_estimate = 2, exponentiate = FALSE, font_css = "font-family: monospace;"  ) {
+
 
 # Check input -------------------------------------------------------------
 
@@ -119,7 +123,7 @@ model_to_html <- function( univariate_models_list, multivariate_models_list, dec
                  estimate = format( round( estimate, decimals_estimate ), nsmall = decimals_estimate),
                  CI       = paste0( "[",
                                     stringr::str_pad( string = as.character(
-                                        format( round( conf.low, decimals_estimate ), nsmall=2)), width = 5, side = "left" ),
+                                        format( round( conf.low, decimals_estimate ), nsmall=2)), width = 5, side = "left", pad = " " ),
                                     ",",
                                     stringr::str_pad( string = as.character(
                                         format( round( conf.high, decimals_estimate ),nsmall=2)), width = 5, side = "left" ),
@@ -147,12 +151,15 @@ model_to_html <- function( univariate_models_list, multivariate_models_list, dec
     n_rgroup_vector     <-   rle(tidy_model$variables)$lengths
     rgroup_vector[ n_rgroup_vector == 1 ]   <- "&nbsp;" # single rows dont need rgroup header
 
-    css_rgroup      <- "font-style: italic;padding-top: 0.4cm;padding-right: 0.4cm;padding-bottom: 0.2cm;"
+    css_rgroup      <- "font-style: italic;padding-top: 0.4cm;padding-right: 0.1cm;padding-bottom: 0.01cm;"
     tidy_model      <- tidy_model[,-1]
     css_matrix      <- matrix(data = "padding-left: 0.5cm; padding-right: 0.5cm;",
                               nrow = nrow(tidy_model),
                               ncol = ncol(tidy_model))
-    css_matrix[, 1] <- "padding-left: 0.4cm; padding-right: 0.3cm;"
+    css_matrix[, 1] <- "padding-left: 0.6cm; padding-right: 0.3cm;"
+
+    names(tidy_model)[  names(tidy_model)=="categories"] <- "&nbsp;"
+
 
      htmlTable::htmlTable(
      x          = tidy_model ,
@@ -161,8 +168,10 @@ model_to_html <- function( univariate_models_list, multivariate_models_list, dec
      n.rgroup   = n_rgroup_vector,
      align      = c("l","r"),
      css.rgroup = css_rgroup,
-     css.cell   = css_matrix
-    )
+     css.cell   = css_matrix,
+     css.table  = font_css
+    ) -> output_htmltable
+         output_htmltable
   }
 
 # combine functions -------------------------------------------------------
@@ -170,9 +179,10 @@ model_to_html <- function( univariate_models_list, multivariate_models_list, dec
  univariate_models_list %>%
    purrr::map( model_gets_ref_levels            ) %>%
    purrr::map( model_gets_formatted_numbers     ) %>%
-   purrr::map( model_becomes_html               )
+   purrr::map( model_becomes_html               ) -> html_table_output
+
+  html_table_output[[1]]
 
 }
-
 
 
