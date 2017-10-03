@@ -15,4 +15,24 @@ input dataset to calculate frequencies and percentages for.}
 \description{
 \code{freq_function} creates frequency and percentage tables.
 }
+\keyword{##}
+\keyword{-}
+\keyword{AN}
+\keyword{BECAUSE}
+\keyword{BUILD}
+\keyword{FREQ_BY}
+\keyword{FUNCTION}
+\keyword{IGNORE}
+\keyword{INSIDE}
+\keyword{IS}
+\keyword{IT}
+\keyword{NOW}
+\keyword{SET}
+\keyword{TO}
+\keyword{can}
+\keyword{freq_by.}
+\keyword{from}
+\keyword{inherit}
 \keyword{internal}
+\keyword{it}
+\keyword{so}

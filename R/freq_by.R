@@ -12,6 +12,9 @@
 #'      Default is'font-family: monospace;'.
 #' @param htmlout Whether to output to html (default and intended usage), or
 #' as r-dataframe.
+#' @param min_cell_count a number which defaults to 10. Used to preserve
+#'     anonymity in case of sensitive data. In cells with <= 10 observations,
+#'     the string "<=10" is printed.
 #' @details The output is a table in HTML which can be viewed in a browser or
 #' included in a knitr-report.
 #' @import tidyverse rlang
@@ -19,11 +22,48 @@
 #' @export freq_by
 #' @examples
 #' # Outputs HTML:
-#' output <- freq_by(example_data, c("cut", "color"), "clarity")
+#' output <-
+#' freq_by(example_data, c("cut", "color"), "clarity", htmlout = FALSE, min_cell_count = 30)
+
+
+freq_by <- function(dataset, var_vector, by_group = NULL, include_total = TRUE, min_cell_count = 10, htmlout = TRUE, font_css = "font-family: monospace;" ) {
+
+  # the worker founction. Defined here so that it inherits parameters from freq_by.
+  freq_function <- function( dataset, var_vektor ) {
+
+
+    inner_function <- function(dataset, var) {
+      var_symbol <-  rlang::sym(var)
+      dataset %>%
+        dplyr::count( UQ( var_symbol )) %>%  tidyr::complete( UQ(var_symbol), fill = list( n = 0)) %>%
+        dplyr::transmute(
+          pct = dplyr::if_else( n > min_cell_count, true = paste0( round( 100 * n / sum(n)), "%" ), false = "-", missing = "-" ),
+          n   = dplyr::if_else( n > min_cell_count, true = prettyNum( n, big.mark = " "), false = paste0("<",min_cell_count), missing = paste0("<",min_cell_count)),
+          variable = var,
+          category = UQ( var_symbol ) )  %>%
+
+        dplyr::select(variable, category, n, pct )
+
+    }
+
+    suppressWarnings(
+      var_vektor %>%
+        purrr::map(  function(x) inner_function(dataset, x) )    %>%
+        dplyr::bind_rows()
+    )
+  }
 
 
 
-freq_by <- function(dataset, var_vector, by_group = NULL, include_total = TRUE, htmlout = TRUE, font_css = "font-family: monospace;" ) {
+
+
+
+
+
+
+
+
+
 
     df_temp                   <- droplevels(as.data.frame(dataset)) # convert to data.frame for easier extraction of values
     dataset                   <- dplyr::as_tibble( droplevels(dataset) )

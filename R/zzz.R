@@ -8,7 +8,8 @@
                                                           "categories",
                                                           "estimate",
                                                           "conf.low",
-                                                          "conf.high"
+                                                          "conf.high",
+                                                          "min_cell_count"
                                                            ))
 
 

@@ -8,6 +8,8 @@
 #' @param font_css A string of CSS code defining the font used for the table. Default is
 #'     'font-family: monospace;'. A monospace font necessary for perfect
 #'     alignment of table cells. Another option:'font-family: "Courier New";'
+#' @param exponentiate logical. Sent to broom::tidy(). Defaults to FALSE.
+#'     Set to TRUE to exponentiate coefficients and CI of model summary.
 #' @importFrom Hmisc cut2
 #' @importFrom dplyr "%>%"
 #' @import survival

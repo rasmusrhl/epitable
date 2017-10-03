@@ -5,7 +5,8 @@
 \title{Frequencies and percentages}
 \usage{
 freq_by(dataset, var_vector, by_group = NULL, include_total = TRUE,
-  htmlout = TRUE, font_css = "font-family: monospace;")
+  min_cell_count = 10, htmlout = TRUE,
+  font_css = "font-family: monospace;")
 }
 \arguments{
 \item{dataset}{A dataset}
@@ -18,6 +19,10 @@ by which to stratify the calculations.}
 
 \item{include_total}{whether to include two extra columns of marginal
 frequencies and percentages, i.e. not stratified by the \code{by_group}.}
+
+\item{min_cell_count}{a number which defaults to 10. Used to preserve
+anonymity in case of sensitive data. In cells with <= 10 observations,
+the string "<=10" is printed.}
 
 \item{htmlout}{Whether to output to html (default and intended usage), or
 as r-dataframe.}
@@ -34,5 +39,6 @@ included in a knitr-report.
 }
 \examples{
 # Outputs HTML:
-output <- freq_by(example_data, c("cut", "color"), "clarity")
+output <-
+freq_by(example_data, c("cut", "color"), "clarity", htmlout = FALSE, min_cell_count = 30)
 }
