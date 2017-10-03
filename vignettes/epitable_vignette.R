@@ -8,6 +8,9 @@ head(example_data)
 ## ---- echo=TRUE, results='asis'------------------------------------------
 freq_by(dataset = example_data, var_vector = c("color", "clarity"), by_group = "cut" )
 
+## ------------------------------------------------------------------------
+freq_by(dataset = example_data, var_vector = c("color", "clarity"), by_group = "cut", font_css = "font-family: Times" )
+
 ## ---- results='asis'-----------------------------------------------------
  df         <- survival::lung
  df$age_bin <- Hmisc::cut2( df$age, g = 5)

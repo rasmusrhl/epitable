@@ -44,9 +44,20 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <h4 class="date"><em>2017-10-03</em></h4>
 
 
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#freq_by"><code>freq_by</code></a></li>
+<li><a href="#model_to_html"><code>model_to_html</code></a></li>
+</ul>
+</div>
 
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p><code>epitable</code> produces tables in the style of epidemiological papers. The output in this vignette does not use a CSS style sheets. The output will look different if a CSS style sheet is used.</p>
+</div>
 <div id="freq_by" class="section level2">
-<h2>freq_by</h2>
+<h2><code>freq_by</code></h2>
 <p>The <code>freq_by</code>-function creates a frequency and percentage table commonly used in epidemiological papers. It is a wrapper for the <a href="https://cran.r-project.org/package=htmlTable">htmlTables-package</a>.</p>
 <pre class="r"><code>head(example_data)</code></pre>
 <pre><code>## # A tibble: 6 x 10
@@ -396,8 +407,8 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'>1 790</td>
 <td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'>3%</td>
 <td style='border-bottom: 2px solid grey;' colspan='1'>&nbsp;</td>
-<td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'>9</td>
-<td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'>1%</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'><10</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'>-</td>
 <td style='border-bottom: 2px solid grey;' colspan='1'>&nbsp;</td>
 <td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'>71</td>
 <td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'>1%</td>
@@ -413,10 +424,365 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 </tr>
 </tbody>
 </table>
-<p>The <code>by_group</code> variable must be of class factor, to ensure correct order.</p>
+<p>The <code>by_group</code> variable must be of class factor, to ensure correct order. The argument <code>min_cell_count</code> sets the minimum number of observations in a cell. It is inteded to preserve anonymity in case of sensitive data. When the cell count is &lt;= <code>min_cell_count</code>, the number is deleted from that cell.</p>
+<p>It is possible to change the font using the <code>font_css</code> argument, but the font needs to be web-friendly. Below the font is set to “font-family: Times”:</p>
+<pre class="r"><code>freq_by(dataset = example_data, var_vector = c(&quot;color&quot;, &quot;clarity&quot;), by_group = &quot;cut&quot;, font_css = &quot;font-family: Times&quot; )</code></pre>
+<table class='gmisc_table' style='border-collapse: collapse; font-family: Times' >
+<thead>
+<tr>
+<th colspan='1' style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'> </th><th style='border-top: 2px solid grey;; border-bottom: hidden;'>&nbsp;</th>
+<th colspan='2' style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Total</th><th style='border-top: 2px solid grey;; border-bottom: hidden;'>&nbsp;</th>
+<th colspan='2' style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Fair</th><th style='border-top: 2px solid grey;; border-bottom: hidden;'>&nbsp;</th>
+<th colspan='2' style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Good</th><th style='border-top: 2px solid grey;; border-bottom: hidden;'>&nbsp;</th>
+<th colspan='2' style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Very Good</th><th style='border-top: 2px solid grey;; border-bottom: hidden;'>&nbsp;</th>
+<th colspan='2' style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Premium</th><th style='border-top: 2px solid grey;; border-bottom: hidden;'>&nbsp;</th>
+<th colspan='2' style='font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>Ideal</th>
+</tr>
+<tr>
+<th style='border-bottom: 1px solid grey; text-align: center;'> </th>
+<th style='border-bottom: 1px solid grey;' colspan='1'>&nbsp;</th>
+<th style='border-bottom: 1px solid grey; text-align: center;'>n</th>
+<th style='border-bottom: 1px solid grey; text-align: center;'>(%)</th>
+<th style='border-bottom: 1px solid grey;' colspan='1'>&nbsp;</th>
+<th style='border-bottom: 1px solid grey; text-align: center;'>n</th>
+<th style='border-bottom: 1px solid grey; text-align: center;'>(%)</th>
+<th style='border-bottom: 1px solid grey;' colspan='1'>&nbsp;</th>
+<th style='border-bottom: 1px solid grey; text-align: center;'>n</th>
+<th style='border-bottom: 1px solid grey; text-align: center;'>(%)</th>
+<th style='border-bottom: 1px solid grey;' colspan='1'>&nbsp;</th>
+<th style='border-bottom: 1px solid grey; text-align: center;'>n</th>
+<th style='border-bottom: 1px solid grey; text-align: center;'>(%)</th>
+<th style='border-bottom: 1px solid grey;' colspan='1'>&nbsp;</th>
+<th style='border-bottom: 1px solid grey; text-align: center;'>n</th>
+<th style='border-bottom: 1px solid grey; text-align: center;'>(%)</th>
+<th style='border-bottom: 1px solid grey;' colspan='1'>&nbsp;</th>
+<th style='border-bottom: 1px solid grey; text-align: center;'>n</th>
+<th style='border-bottom: 1px solid grey; text-align: center;'>(%)</th>
+</tr>
+</thead>
+<tbody> 
+<tr><td colspan='19' style='font-style: italic; padding-top: 0.4cm; padding-right: 0.4cm; padding-bottom: 0.2cm;'>Color</td></tr>
+<tr>
+<td style='padding-left: 0.4cm; padding-right: 0.3cm; text-align: left;'>D</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>6 775</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>13%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>163</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>10%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>662</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>13%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>1 513</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>13%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>1 603</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>12%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>2 834</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>13%</td>
+</tr>
+<tr>
+<td style='padding-left: 0.4cm; padding-right: 0.3cm; text-align: left;'>E</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>9 797</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>18%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>224</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>14%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>933</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>19%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>2 400</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>20%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>2 337</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>17%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>3 903</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>18%</td>
+</tr>
+<tr>
+<td style='padding-left: 0.4cm; padding-right: 0.3cm; text-align: left;'>F</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>9 542</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>18%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>312</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>19%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>909</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>19%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>2 164</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>18%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>2 331</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>17%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>3 826</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>18%</td>
+</tr>
+<tr>
+<td style='padding-left: 0.4cm; padding-right: 0.3cm; text-align: left;'>G</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>11 292</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>21%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>314</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>20%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>871</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>18%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>2 299</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>19%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>2 924</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>21%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>4 884</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>23%</td>
+</tr>
+<tr>
+<td style='padding-left: 0.4cm; padding-right: 0.3cm; text-align: left;'>H</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>8 304</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>15%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>303</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>19%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>702</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>14%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>1 824</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>15%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>2 360</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>17%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>3 115</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>14%</td>
+</tr>
+<tr>
+<td style='padding-left: 0.4cm; padding-right: 0.3cm; text-align: left;'>I</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>5 422</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>10%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>175</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>11%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>522</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>11%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>1 204</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>10%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>1 428</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>10%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>2 093</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>10%</td>
+</tr>
+<tr>
+<td style='padding-left: 0.4cm; padding-right: 0.3cm; text-align: left;'>J</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>2 808</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>5%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>119</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>7%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>307</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>6%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>678</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>6%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>808</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>6%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>896</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>4%</td>
+</tr> 
+<tr><td colspan='19' style='font-style: italic; padding-top: 0.4cm; padding-right: 0.4cm; padding-bottom: 0.2cm;'>Clarity</td></tr>
+<tr>
+<td style='padding-left: 0.4cm; padding-right: 0.3cm; text-align: left;'>I1</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>741</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>1%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>210</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>13%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>96</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>2%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>84</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>1%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>205</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>1%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>146</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>1%</td>
+</tr>
+<tr>
+<td style='padding-left: 0.4cm; padding-right: 0.3cm; text-align: left;'>SI2</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>9 194</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>17%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>466</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>29%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>1 081</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>22%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>2 100</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>17%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>2 949</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>21%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>2 598</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>12%</td>
+</tr>
+<tr>
+<td style='padding-left: 0.4cm; padding-right: 0.3cm; text-align: left;'>SI1</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>13 065</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>24%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>408</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>25%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>1 560</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>32%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>3 240</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>27%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>3 575</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>26%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>4 282</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>20%</td>
+</tr>
+<tr>
+<td style='padding-left: 0.4cm; padding-right: 0.3cm; text-align: left;'>VS2</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>12 258</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>23%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>261</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>16%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>978</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>20%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>2 591</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>21%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>3 357</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>24%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>5 071</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>24%</td>
+</tr>
+<tr>
+<td style='padding-left: 0.4cm; padding-right: 0.3cm; text-align: left;'>VS1</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>8 171</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>15%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>170</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>11%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>648</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>13%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>1 775</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>15%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>1 989</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>14%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>3 589</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>17%</td>
+</tr>
+<tr>
+<td style='padding-left: 0.4cm; padding-right: 0.3cm; text-align: left;'>VVS2</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>5 066</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>9%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>69</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>4%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>286</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>6%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>1 235</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>10%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>870</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>6%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>2 606</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>12%</td>
+</tr>
+<tr>
+<td style='padding-left: 0.4cm; padding-right: 0.3cm; text-align: left;'>VVS1</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>3 655</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>7%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>17</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>1%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>186</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>4%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>789</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>7%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>616</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>4%</td>
+<td style='' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>2 047</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; text-align: right;'>9%</td>
+</tr>
+<tr>
+<td style='padding-left: 0.4cm; padding-right: 0.3cm; border-bottom: 2px solid grey; text-align: left;'>IF</td>
+<td style='border-bottom: 2px solid grey;' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'>1 790</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'>3%</td>
+<td style='border-bottom: 2px solid grey;' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'><10</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'>-</td>
+<td style='border-bottom: 2px solid grey;' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'>71</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'>1%</td>
+<td style='border-bottom: 2px solid grey;' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'>268</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'>2%</td>
+<td style='border-bottom: 2px solid grey;' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'>230</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'>2%</td>
+<td style='border-bottom: 2px solid grey;' colspan='1'>&nbsp;</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'>1 212</td>
+<td style='padding-left: 0.5cm; padding-right: 0.5cm; border-bottom: 2px solid grey; text-align: right;'>6%</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="model_to_html" class="section level2">
-<h2>model_to_html</h2>
+<h2><code>model_to_html</code></h2>
 <p>The <code>model_to_html</code>-function can print simple models to HTML, also printing the reference levels of the categorical covariates.</p>
 <pre class="r"><code> df         &lt;- survival::lung
  df$age_bin &lt;- Hmisc::cut2( df$age, g = 5)
@@ -514,7 +880,6 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <li>include other summary statistics</li>
 <li>option to render blank cells containing few observations, to ensure anonymity.</li>
 </ul>
-<p>The output is a HTML-table created by the htmlTable-package. The HTML-output looks best if no CSS is used.</p>
 </div>
 
 

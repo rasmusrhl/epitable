@@ -10,6 +10,8 @@
 #'     alignment of table cells. Another option:'font-family: "Courier New";'
 #' @param exponentiate logical. Sent to broom::tidy(). Defaults to FALSE.
 #'     Set to TRUE to exponentiate coefficients and CI of model summary.
+#' @param cgroup_names A character vector of length equal to 1 + length of
+#'     \code{multivariate_models_list} (if one is supplied).
 #' @importFrom Hmisc cut2
 #' @importFrom dplyr "%>%"
 #' @import survival
@@ -27,7 +29,10 @@
 #' glm_logistic     <- glm( cut=="Ideal" ~  color + clarity + x , data = diamonds, family = "binomial")
 #' glm_linear       <- glm( Sepal.Width ~  Petal.Width + Species, data = iris)
 
-model_to_html <- function( univariate_models_list, multivariate_models_list, decimals_estimate = 2, exponentiate = FALSE, font_css = "font-family: monospace;"  ) {
+model_to_html <- function( univariate_models_list,
+                           multivariate_models_list = NULL,
+                           decimals_estimate = 2,
+                           exponentiate = FALSE, cgroup_names = " ", font_css = "font-family: monospace;"  ) {
 
 
 # Check input -------------------------------------------------------------
@@ -147,11 +152,17 @@ model_to_html <- function( univariate_models_list, multivariate_models_list, dec
 
     tidy_model
   }
+
   model_becomes_html           <- function( tidy_model        ) {
+
+    # tidy_model <- htmloutput # delete me
+    # cgroup_names <- " " # delete me
+    # n_cgroup     <- 3 # delete me
+    # font_css     <- "font-family: monospace;" # delete me
 
     rgroup_vector       <-   stringr::str_to_title( rle(tidy_model$variables)$values )
     n_rgroup_vector     <-   rle(tidy_model$variables)$lengths
-    rgroup_vector[ n_rgroup_vector == 1 ]   <- "&nbsp;" # single rows dont need rgroup header
+    rgroup_vector[ n_rgroup_vector == 1 ]   <-  " " #"&nbsp;" # single rows dont need rgroup header
 
     css_rgroup      <- "font-style: italic;padding-top: 0.4cm;padding-right: 0.1cm;padding-bottom: 0.01cm;"
     tidy_model      <- tidy_model[,-1]
@@ -171,20 +182,44 @@ model_to_html <- function( univariate_models_list, multivariate_models_list, dec
      align      = c("l","r"),
      css.rgroup = css_rgroup,
      css.cell   = css_matrix,
-     css.table  = font_css
+     css.table  = font_css,
+     cgroup     = cgroup_names,
+     n.cgroup   = n_cgroup
     ) -> output_htmltable
          output_htmltable
   }
 
 # combine functions -------------------------------------------------------
 
+
+
+  if ( rlang::is_null(multivariate_models_list) ) {
+    cgroup_names   <- cgroup_names
+    n_cgroup <- 3
+
  univariate_models_list %>%
    purrr::map( model_gets_ref_levels            ) %>%
-   purrr::map( model_gets_formatted_numbers     ) %>%
-   purrr::map( model_becomes_html               ) -> html_table_output
+   purrr::map( model_gets_formatted_numbers     ) %>% bind_rows() %>%
+   model_becomes_html()
 
-  html_table_output[[1]]
+   } else if ( is_list(multivariate_models_list)) {
+
+   univariate_models_list %>%
+   purrr::map( model_gets_ref_levels            ) %>%
+   purrr::map( model_gets_formatted_numbers     ) %>% bind_rows() -> left_column
+    left_column
+   # multivariate_models_list %>%
+     # purrr::map( model_gets_ref_levels            ) %>%
+     # purrr::map( model_gets_formatted_numbers     ) %>%
+
+
+  }
+
+  # html_table_output[[1]]
 
 }
+
+
+
 
 
