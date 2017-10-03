@@ -12,15 +12,15 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 ---
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-library(epitable)
 library(dplyr)
+library(epitable)
 ```
 
-## Introduction
+# Introduction
 `epitable` produces tables in the style of epidemiological papers. The output in this vignette does not use a CSS style sheets. The output will look different if a CSS style sheet is used. 
 
 
-## `freq_by`
+# `freq_by`
 The `freq_by`-function creates a frequency and percentage table commonly used in
 epidemiological papers. It is a wrapper for the [htmlTables-package](https://cran.r-project.org/package=htmlTable).
 
@@ -41,9 +41,11 @@ freq_by(dataset = example_data, var_vector = c("color", "clarity"), by_group = "
 ```
 
 
-## `model_to_html`
+# `model_to_html`
 
-The `model_to_html`-function can print simple models to HTML, also printing the reference levels of the categorical covariates.
+The `model_to_html`-function can print simple models to HTML, also printing the reference levels of the categorical covariates. It does not support variables of class `ordered`. 
+
+## Printing a `coxph`-model
 
 ```{r, results='asis'}
  df         <- survival::lung
@@ -51,22 +53,54 @@ The `model_to_html`-function can print simple models to HTML, also printing the 
  df$ph_bin  <- Hmisc::cut2( df$ph.karno, g = 5)
  df$sex     <- factor( df$sex)
  model1      <- survival::coxph( survival::Surv( time = time, event = status==1) ~ age_bin + factor(sex) + ph_bin + wt.loss, data = df )
- 
  model_to_html(model1, exponentiate = TRUE )
 ```
 
 
-
+## Printing a logistic regression
 
 ```{r}
-# 
-#  diamonds <- ggplot2::diamonds
-#  diamonds$color <- factor(diamonds$color, ordered = FALSE)
-#  diamonds$clarity <- factor(diamonds$clarity, ordered = FALSE)
-#  glm_logistic <- glm( cut=="Ideal" ~  color + clarity + x , data = diamonds, family = "binomial")
-#  glm_linear <- glm( Sepal.Width ~  Petal.Width + Species, data = iris)
+ diamonds <- ggplot2::diamonds
+ diamonds$color <- factor(diamonds$color, ordered = FALSE)
+ diamonds$clarity <- factor(diamonds$clarity, ordered = FALSE)
+ glm_logistic <- glm( cut=="Ideal" ~  color + clarity + x , data = diamonds, family = "binomial")
+ model_to_html(glm_logistic, exponentiate = TRUE)
+```
+
+
+## Printing a general linear regression
+
+```{r}
+ glm_linear <- glm( Sepal.Width ~  Petal.Width + Sepal.Length + Petal.Length +  Species, data = iris)
+ model_to_html(glm_linear) 
+```
+
+
+## Printing a two lists of models
+
+The example below tages two lists of models. One list of univariate models, and another list of multivariate models. The multivariate models include incrementally more variables, so that the final multivariate model include all the variables used in the univariate models.
+
+```{r}
+# univariate models in a list:
+c("Age" , "Embarked" , "Sex" , "Fare" , "Pclass") %>%
+  paste0( "Survived ~ ", . ) %>%
+  purrr::map( ~ glm( as.formula(.), data = titanic, family = "binomial" )) -> univar_list
+
+# multivariate models in a list:
+glm_logistic_1 <- glm( Survived ~  Age + Embarked, data = titanic, family = "binomial")
+glm_logistic_2 <- glm( Survived ~  Age + Embarked + Sex + Fare, data = titanic, family = "binomial")
+glm_logistic_3 <- glm( Survived ~  Age + Embarked + Sex + Fare + Pclass, data = titanic, family = "binomial")
+multi_model_list <- list(glm_logistic_1, glm_logistic_2,  glm_logistic_3 )
+
+model_to_html(univariate_models_list = univar_list,
+              multivariate_models_list = multi_model_list,
+              exponentiate = TRUE ) 
 
 ```
+
+
+
+
 
 
 
@@ -76,9 +110,7 @@ To do in a possible future:
 
 * Add totals to each of the `by_group`s
 * option to specify better names to the rgroup, not just the variable names.
-* function for adding reference levels to regression models.
 * include other summary statistics
-* option to render blank cells containing few observations, to ensure anonymity.
 
 
 

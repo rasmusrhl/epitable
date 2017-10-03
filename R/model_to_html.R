@@ -12,6 +12,7 @@
 #'     Set to TRUE to exponentiate coefficients and CI of model summary.
 #' @param cgroup_names A character vector of length equal to 1 + length of
 #'     \code{multivariate_models_list} (if one is supplied).
+#' @param html_output logical. Defaults to TRUE. Set to false to output data.frame.
 #' @importFrom Hmisc cut2
 #' @importFrom dplyr "%>%"
 #' @import survival
@@ -32,7 +33,10 @@
 model_to_html <- function( univariate_models_list,
                            multivariate_models_list = NULL,
                            decimals_estimate = 2,
-                           exponentiate = FALSE, cgroup_names = " ", font_css = "font-family: monospace;"  ) {
+                           exponentiate = FALSE,
+                           cgroup_names = NULL,
+                           html_output  = TRUE,
+                           font_css = "font-family: monospace;"  ) {
 
 
 # Check input -------------------------------------------------------------
@@ -155,6 +159,7 @@ model_to_html <- function( univariate_models_list,
 
   model_becomes_html           <- function( tidy_model        ) {
 
+
     # tidy_model <- htmloutput # delete me
     # cgroup_names <- " " # delete me
     # n_cgroup     <- 3 # delete me
@@ -162,16 +167,17 @@ model_to_html <- function( univariate_models_list,
 
     rgroup_vector       <-   stringr::str_to_title( rle(tidy_model$variables)$values )
     n_rgroup_vector     <-   rle(tidy_model$variables)$lengths
-    rgroup_vector[ n_rgroup_vector == 1 ]   <-  " " #"&nbsp;" # single rows dont need rgroup header
+    rgroup_vector[ n_rgroup_vector == 1 ]   <-  "&nbsp;" # single rows dont need rgroup header
 
     css_rgroup      <- "font-style: italic;padding-top: 0.4cm;padding-right: 0.1cm;padding-bottom: 0.01cm;"
     tidy_model      <- tidy_model[,-1]
-    css_matrix      <- matrix(data = "padding-left: 0.5cm; padding-right: 0.5cm;",
+    css_matrix      <- matrix(data = "padding-left: 0.3cm; padding-right: 0.3cm;",
                               nrow = nrow(tidy_model),
                               ncol = ncol(tidy_model))
-    css_matrix[, 1] <- "padding-left: 0.6cm; padding-right: 0.3cm;"
+    css_matrix[, 1] <- "padding-left: 0.3cm; padding-right: 0.3cm;"
 
     names(tidy_model)[  names(tidy_model)=="categories"] <- "&nbsp;"
+    names(tidy_model) <- stringr::str_replace( names(tidy_model), "\\..*", "" )
 
 
      htmlTable::htmlTable(
@@ -184,7 +190,7 @@ model_to_html <- function( univariate_models_list,
      css.cell   = css_matrix,
      css.table  = font_css,
      cgroup     = cgroup_names,
-     n.cgroup   = n_cgroup
+     n.cgroup   = n_cgroup_names
     ) -> output_htmltable
          output_htmltable
   }
@@ -192,27 +198,54 @@ model_to_html <- function( univariate_models_list,
 # combine functions -------------------------------------------------------
 
 
-
+# if no multivariate_models_list is provided ------------
   if ( rlang::is_null(multivariate_models_list) ) {
-    cgroup_names   <- cgroup_names
-    n_cgroup <- 3
+    if ( rlang::is_null(cgroup_names)) {
+      cgroup_names <- " "
+      n_cgroup_names <- 3
+    } else {
+    n_cgroup_names <- 3
+    }
 
  univariate_models_list %>%
    purrr::map( model_gets_ref_levels            ) %>%
-   purrr::map( model_gets_formatted_numbers     ) %>% bind_rows() %>%
+   purrr::map( model_gets_formatted_numbers     ) %>% dplyr::bind_rows() %>%
    model_becomes_html()
 
-   } else if ( is_list(multivariate_models_list)) {
 
-   univariate_models_list %>%
-   purrr::map( model_gets_ref_levels            ) %>%
-   purrr::map( model_gets_formatted_numbers     ) %>% bind_rows() -> left_column
-    left_column
-   # multivariate_models_list %>%
-     # purrr::map( model_gets_ref_levels            ) %>%
-     # purrr::map( model_gets_formatted_numbers     ) %>%
+   } else if ( rlang::is_list(multivariate_models_list)) {
 
 
+
+     univariate_models_list %>%
+        purrr::map( model_gets_ref_levels            ) %>%
+        purrr::map( model_gets_formatted_numbers     ) %>% dplyr::bind_rows() -> left_column
+
+     multivariate_models_list %>%
+        purrr::map( model_gets_ref_levels            )  %>%
+        purrr::map( model_gets_formatted_numbers     )  %>%
+
+     Reduce(function(x, y)
+        dplyr::full_join(x, y,  by = c( "variables", "categories" )), .) -> right_column
+
+        dplyr::left_join(left_column, right_column, by = c("variables", "categories")) -> final_model_as_data_frame
+
+        names(final_model_as_data_frame) <- stringr::str_replace( names(final_model_as_data_frame), "\\..*", "" )
+
+      if( rlang::is_null(cgroup_names)) {
+         cgroup_names    <- c(" ", "Univariate models", paste0( "Model ", 1:( ( ncol(final_model_as_data_frame) - 4 )/2 ) ) )
+         n_cgroup_names  <- c(1, rep(2, times = length(cgroup_names)-1 ))
+          } else if ( !rlang::is_null(cgroup_names)) {
+         n_cgroup_names  <- c(1, rep(2, times = length(cgroup_names)-1 ))
+            }
+
+
+
+        if (!html_output) {
+         final_model_as_data_frame
+        } else {
+          final_model_as_data_frame %>% model_becomes_html()
+        }
   }
 
   # html_table_output[[1]]

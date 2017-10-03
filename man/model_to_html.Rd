@@ -4,9 +4,9 @@
 \alias{model_to_html}
 \title{Print regression models to HTML}
 \usage{
-model_to_html(univariate_models_list, multivariate_models_list,
-  decimals_estimate = 2, exponentiate = FALSE,
-  font_css = "font-family: monospace;")
+model_to_html(univariate_models_list, multivariate_models_list = NULL,
+  decimals_estimate = 2, exponentiate = FALSE, cgroup_names = NULL,
+  html_output = TRUE, font_css = "font-family: monospace;")
 }
 \arguments{
 \item{univariate_models_list}{List of univariate models}
@@ -17,6 +17,11 @@ model_to_html(univariate_models_list, multivariate_models_list,
 
 \item{exponentiate}{logical. Sent to broom::tidy(). Defaults to FALSE.
 Set to TRUE to exponentiate coefficients and CI of model summary.}
+
+\item{cgroup_names}{A character vector of length equal to 1 + length of
+\code{multivariate_models_list} (if one is supplied).}
+
+\item{html_output}{logical. Defaults to TRUE. Set to false to output data.frame.}
 
 \item{font_css}{A string of CSS code defining the font used for the table. Default is
 'font-family: monospace;'. A monospace font necessary for perfect
