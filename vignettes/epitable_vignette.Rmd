@@ -1,10 +1,8 @@
 ---
-title: "epitable"
-author: "Rasmus Larsen"
+title: "`epitable` Create HTML Tables in the Style Used in Epidemiological Papers"
 date: "`r Sys.Date()`"
 output:
   html_document:
-    theme: null
     toc: yes
 vignette: >
   %\VignetteIndexEntry{epitable_vignette}
@@ -17,8 +15,7 @@ library(epitable)
 ```
 
 # Introduction
-`epitable` produces tables in the style of epidemiological papers. The output in this vignette does not use a CSS style sheets. The output will look different if a CSS style sheet is used. 
-
+`epitable` produces tables in the style of epidemiological papers. The output in this vignette is 
 
 # `freq_by`
 The `freq_by`-function creates a frequency and percentage table commonly used in
@@ -26,11 +23,6 @@ epidemiological papers. It is a wrapper for the [htmlTables-package](https://cra
 
 ```{r}
 head(example_data)
-```
-
-Counts and frequencies of the variables `color`and `clarity` grouped by `cut` is obtained below:
-```{r, echo=TRUE, results='asis'}
-freq_by(dataset = example_data, var_vector = c("color", "clarity"), by_group = "cut" )
 ```
 
 The `by_group` variable must be of class factor, to ensure correct order. The argument `min_cell_count` sets the minimum number of observations in a cell. It is inteded to preserve anonymity in case of sensitive data. When the cell count is <= `min_cell_count`, the number is deleted from that cell. 
