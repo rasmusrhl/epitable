@@ -8,6 +8,8 @@
 #' by which to stratify the calculations.
 #' @param include_total whether to include two extra columns of marginal
 #' frequencies and percentages, i.e. not stratified by the \code{by_group}.
+#' @param font_css A string of CSS code defining the font used for the table.
+#'      Default is'font-family: monospace;'.
 #' @param htmlout Whether to output to html (default and intended usage), or
 #' as r-dataframe.
 #' @details The output is a table in HTML which can be viewed in a browser or
@@ -20,7 +22,8 @@
 #' output <- freq_by(example_data, c("cut", "color"), "clarity")
 
 
-freq_by <- function(dataset, var_vector, by_group = NULL, include_total = TRUE, htmlout = TRUE) {
+
+freq_by <- function(dataset, var_vector, by_group = NULL, include_total = TRUE, htmlout = TRUE, font_css = "font-family: monospace;" ) {
 
     df_temp                   <- droplevels(as.data.frame(dataset)) # convert to data.frame for easier extraction of values
     dataset                   <- dplyr::as_tibble( droplevels(dataset) )
@@ -113,14 +116,15 @@ freq_by <- function(dataset, var_vector, by_group = NULL, include_total = TRUE, 
 
       htmlTable::htmlTable(
         x =  table1,
-        rnames = FALSE,
-        cgroup   = c_group_vektor,
-        n.cgroup = n_c_group_vektor,
-        rgroup   = rgroup_vektor,
-        n.rgroup = n_rgroup_vektor,
-        align = alignment_vektor,
+        rnames     = FALSE,
+        cgroup     = c_group_vektor,
+        n.cgroup   = n_c_group_vektor,
+        rgroup     = rgroup_vektor,
+        n.rgroup   = n_rgroup_vektor,
+        align      = alignment_vektor,
+        css.table  = font_css,
         css.rgroup = "font-style: italic;padding-top: 0.4cm;padding-right: 0.4cm;padding-bottom: 0.2cm;",
-        css.cell = css_matrix
+        css.cell   = css_matrix
       )
 
     }

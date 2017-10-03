@@ -16,8 +16,8 @@ library(epitable)
 library(dplyr)
 ```
 
-
-The epitable package creates a frequency and percentage table commonly used in
+## freq_by
+The `freq_by`-function creates a frequency and percentage table commonly used in
 epidemiological papers. It is a wrapper for the [htmlTables-package](https://cran.r-project.org/package=htmlTable).
 
 ```{r}
@@ -30,6 +30,40 @@ freq_by(dataset = example_data, var_vector = c("color", "clarity"), by_group = "
 ```
 
 The `by_group` variable must be of class factor, to ensure correct order.  
+
+## model_to_html
+
+The `model_to_html`-function can print simple models to HTML, also printing the reference levels of the categorical covariates.
+
+```{r, results='asis'}
+ df         <- survival::lung
+ df$age_bin <- Hmisc::cut2( df$age, g = 5)
+ df$ph_bin  <- Hmisc::cut2( df$ph.karno, g = 5)
+ df$sex     <- factor( df$sex)
+ model1      <- survival::coxph( survival::Surv( time = time, event = status==1) ~ age_bin + factor(sex) + ph_bin + wt.loss, data = df )
+ 
+ model_to_html(model1, exponentiate = TRUE )
+```
+
+
+
+
+```{r}
+# 
+#  diamonds <- ggplot2::diamonds
+#  diamonds$color <- factor(diamonds$color, ordered = FALSE)
+#  diamonds$clarity <- factor(diamonds$clarity, ordered = FALSE)
+#  glm_logistic <- glm( cut=="Ideal" ~  color + clarity + x , data = diamonds, family = "binomial")
+#  glm_linear <- glm( Sepal.Width ~  Petal.Width + Species, data = iris)
+
+```
+
+
+
+
+
+
+
 
 
 
