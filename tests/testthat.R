@@ -4,7 +4,6 @@
 # test_check("epitable")
 #' @import testthat
 
-# models to check
 
 
 # check list
@@ -58,7 +57,7 @@ utils::browseURL(tempfile)
 
 
 
-### Test 2
+### Test 2 Logistic regression lists
 # univariate models in a list:
 c("Age" , "Embarked" , "Sex" , "Fare" , "Pclass") %>%
   paste0( "Survived ~ ", . ) %>%
@@ -77,6 +76,34 @@ model_to_html(univariate_models_list = univar_list,
 tempfile <- tempfile(pattern = "file", tmpdir = tempdir(), fileext = ".html")
 readr::write_file( htmloutput[[1]], tempfile)
 utils::browseURL(tempfile)
+
+
+### Test 2 Logistic regression lists
+
+
+lung <- survival::lung
+c( "inst",  "age", "sex", "ph.ecog", "ph.karno", "pat.karno", "meal.cal", "wt.loss" )  %>%
+  paste0( " Surv( time, status==2) ~ ", . ) %>%
+  purrr::map( ~ coxph( as.formula(.), data = lung )) -> univariate_coxph_list
+
+coxph_model1 <- survival::coxph( survival::Surv( time, status==2) ~ inst + age + sex, lung)
+coxph_model2 <- survival::coxph( survival::Surv( time, status==2) ~ inst + age + sex + ph.ecog + ph.karno, lung)
+coxph_model3 <- survival::coxph( survival::Surv( time, status==2) ~ inst + age + sex + ph.ecog + ph.karno + pat.karno, lung)
+coxph_model4 <- survival::coxph( survival::Surv( time, status==2) ~ inst + age + sex + ph.ecog + ph.karno + pat.karno + meal.cal + wt.loss, lung)
+
+multivariate_coxph_list <- list( coxph_model1, coxph_model2, coxph_model3, coxph_model4 )
+
+
+model_to_html( univariate_coxph_list, multivariate_models_list = multivariate_coxph_list )
+tempfile <- tempfile(pattern = "file", tmpdir = tempdir(), fileext = ".html")
+readr::write_file( htmloutput[[1]], tempfile)
+utils::browseURL(tempfile)
+
+
+broom::tidy( coxph_model4)
+
+library(broom)
+
 
 
 

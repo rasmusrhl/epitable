@@ -60,11 +60,6 @@ model_to_html <- function( univariate_models_list,
     if ("ordered" %in% attr(model_object$terms, "dataClasses")) {
        stop ("add_reference_levels() does not support ordered factors in the model object. Check the class of the covariates in the model and ensure that they are not class 'ordered' ")
     }
-    # in future maybe make implement autochoice of exponentiate if exponentiate is NULL.
-    # if ( "coxph" %in% class(model_object) & is.null(exponentiate) ) {
-    #  exponentiate <- TRUE     } else if ( model_object$family$link %in% "logit" & is.null(exponentiate ) {
-    #  exponentiate <- TRUE
-    #   }
 
 
     # extract pretty categorical variables (used for presentation, including ref category)
@@ -198,54 +193,59 @@ model_to_html <- function( univariate_models_list,
 # combine functions -------------------------------------------------------
 
 
-# if no multivariate_models_list is provided ------------
-  if ( rlang::is_null(multivariate_models_list) ) {
-    if ( rlang::is_null(cgroup_names)) {
+
+  # if multivariate_models_list is not provided ------------
+  if (rlang::is_null(multivariate_models_list)) {
+    if (rlang::is_null(cgroup_names)) {
       cgroup_names <- " "
       n_cgroup_names <- 3
     } else {
-    n_cgroup_names <- 3
+      n_cgroup_names <- 3
     }
 
- univariate_models_list %>%
-   purrr::map( model_gets_ref_levels            ) %>%
-   purrr::map( model_gets_formatted_numbers     ) %>% dplyr::bind_rows() %>%
-   model_becomes_html()
+    univariate_models_list %>%
+      purrr::map(model_gets_ref_levels) %>%
+      purrr::map(model_gets_formatted_numbers) %>% dplyr::bind_rows() -> univariate_model_output
+    # output to either html or dataframe:
+    if (rlang::is_true(html_output)) {
+      univariate_model_output %>% model_becomes_html()
+    } else {
+      univariate_model_output
+    }
+
+  # if mulativariate_models_list is provided
+  } else if (rlang::is_list(multivariate_models_list)) {
+    univariate_models_list %>%
+      purrr::map(model_gets_ref_levels) %>%
+      purrr::map(model_gets_formatted_numbers) %>% dplyr::bind_rows()                      -> left_column
+
+    multivariate_models_list %>%
+      purrr::map(model_gets_ref_levels)  %>%
+      purrr::map(model_gets_formatted_numbers)  %>%
+      Reduce(function(x, y) dplyr::full_join(x, y,  by = c("variables", "categories")), .) -> right_column
+
+    dplyr::left_join(left_column, right_column, by = c("variables", "categories")) -> final_model_as_data_frame
+
+    names(final_model_as_data_frame) <- stringr::str_replace(names(final_model_as_data_frame), "\\..*", "")
+
+    if (rlang::is_null(cgroup_names)) {
+      cgroup_names    <-
+        c(" ", "Univariate models", paste0("Model ", 1:((
+          ncol(final_model_as_data_frame) - 4
+        ) / 2)))
+      n_cgroup_names  <-
+        c(1, rep(2, times = length(cgroup_names) - 1))
+    } else if (!rlang::is_null(cgroup_names)) {
+      n_cgroup_names  <- c(1, rep(2, times = length(cgroup_names) - 1))
+    }
 
 
-   } else if ( rlang::is_list(multivariate_models_list)) {
-
-
-
-     univariate_models_list %>%
-        purrr::map( model_gets_ref_levels            ) %>%
-        purrr::map( model_gets_formatted_numbers     ) %>% dplyr::bind_rows() -> left_column
-
-     multivariate_models_list %>%
-        purrr::map( model_gets_ref_levels            )  %>%
-        purrr::map( model_gets_formatted_numbers     )  %>%
-
-     Reduce(function(x, y)
-        dplyr::full_join(x, y,  by = c( "variables", "categories" )), .) -> right_column
-
-        dplyr::left_join(left_column, right_column, by = c("variables", "categories")) -> final_model_as_data_frame
-
-        names(final_model_as_data_frame) <- stringr::str_replace( names(final_model_as_data_frame), "\\..*", "" )
-
-      if( rlang::is_null(cgroup_names)) {
-         cgroup_names    <- c(" ", "Univariate models", paste0( "Model ", 1:( ( ncol(final_model_as_data_frame) - 4 )/2 ) ) )
-         n_cgroup_names  <- c(1, rep(2, times = length(cgroup_names)-1 ))
-          } else if ( !rlang::is_null(cgroup_names)) {
-         n_cgroup_names  <- c(1, rep(2, times = length(cgroup_names)-1 ))
-            }
-
-
-
-        if (!html_output) {
-         final_model_as_data_frame
-        } else {
-          final_model_as_data_frame %>% model_becomes_html()
-        }
+    # output to either HTML or dataframe
+    if (!html_output) {
+      final_model_as_data_frame
+    } else {
+      final_model_as_data_frame %>% model_becomes_html()
+    }
   }
 
   # html_table_output[[1]]

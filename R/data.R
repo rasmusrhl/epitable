@@ -18,3 +18,23 @@
 #'   \item{table}{width of top of diamond relative to widest point (43--95)}
 #' }
 "example_data"
+#' The titanic dataset
+#'
+#' The titanic dataset from the kaggle competition, but with labels.
+#'
+#' @format A data frame with 891 rows and 12 variables:
+#' \describe{
+#'   \item{PassengerId}{}
+#'   \item{Survived}{}
+#'   \item{Pclass}{}
+#'   \item{Name}{}
+#'   \item{Sex}{}
+#'   \item{Age}{}
+#'   \item{SibSp}{}
+#'   \item{Parch}{}
+#'   \item{Ticket}{}
+#'   \item{Fare}{}
+#'   \item{Cabin}{}
+#'   \item{Embarked}{}
+#' }
+"titanic"
