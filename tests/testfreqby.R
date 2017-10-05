@@ -24,21 +24,51 @@ rnorm(200) %>%
 c
 
 # before ------------------------------------------------------------------
-
-
+library(tidyver)
+dataset <- diamonds
+var_vector <- c("cut", "color", "price" )
 freq_by <- function(dataset, var_vector, by_group = NULL, include_total = TRUE, min_cell_count = 10, htmlout = TRUE, font_css = "font-family: monospace;" ) {
 
-  # the worker founction. Defined here so that it inherits parameters from freq_by.
-  freq_function <- function( dataset, var_vektor ) {
-
-dataset <- diamonds
-numeric_data      <- dataset[, c("cut", "color", "price", "clarity")] %>% dplyr::select_if( is.numeric )
-categorical_data  <- dataset[, c("cut", "color", "price", "clarity")] %>% dplyr::select_if( function(x) is.factor(x) | is.character(x) )
+by_group_symbol <- rlang::sym(by_group)
+numeric_data      <- dataset[, var_vector ] %>% dplyr::select_if( is.numeric )
+categorical_data  <- dataset[, var_vector ] %>% dplyr::select_if( function(x) is.factor(x) | is.character(x) )
 min_cell_count <- 5
 var <- "cut"
 
+}
+
+freq_by(diamonds, var_vector, "clarity")
+
+freq_fun <- function("piece_of_var_vector") {
+
+ var <- rlang::sym("piece_of_var_vector")
+ chi_test <- chisq.test( diamonds %>% pull(color), diamonds %>% pull(cut))
+
+ dataset %>% count(UQ(), color) %>% complete( cut, color, fill = list( n = 0 ))  %>%
+
+   group_by(cut) %>% transmute( variable = cut,
+                                category = color,
+                                  pct    = paste0( round(100* n /sum(n)), "%"),
+                                   n     = prettyNum(n, big.mark = " " )) %>%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     inner_function <- function(grouped_cat_data, var) {
       var_symbol <-  rlang::sym(var)
+      group_var_symbol <- rlang::sym(by_group)
       grouped_cat_data %>%
         dplyr::count( UQ( var_symbol )) %>%  tidyr::complete( UQ(var_symbol), fill = list( n = 0)) %>%
         transmute(
@@ -48,35 +78,6 @@ var <- "cut"
         dplyr::select(variable, category, n)
     }
 
-
-  categorical_data  %>% group_by(clarity ) %>%
-   do( "counts" =  count(., cut)  )         ->  out
-
- out %>% unnest()
-
- out$asdf
-chisq.test(diamonds$clarity, diamonds$cut )
-library(dplyr)
-iris %>%
-  group_by(Species) %>%
-  do({
-    mod <- lm(Sepal.Length ~ Sepal.Width, data = .)
-    pred <- predict(mod, newdata = .["Sepal.Width"])
-    data.frame(., .["Species"][1])
-  })
-
-cut er grupperingsvariablen
-color er tællevariablen
-freq_fun <- function("variable_to_count") {
-
- chisq.test( diamonds %>% pull(color), diamonds %>% pull(cut))
-
- diamonds %>% count(cut, color) %>% complete( cut, color, fill = list( n = 0 ))  %>%
-
-   group_by(cut) %>% transmute( variable = cut,
-                                category = color,
-                                  pct    = paste0( round(100* n /sum(n)), "%"),
-                                   n     = prettyNum(n, big.mark = " " )) %>%
 
    print( n = 30)
 
