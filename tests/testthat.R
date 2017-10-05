@@ -103,6 +103,76 @@ utils::browseURL(tempfile)
 broom::tidy( coxph_model4)
 
 library(broom)
+library(dplyr)
+lung <- survival::lung
+lung$origin <- sample( c("Danish", "Non-Western Immigrant", "Western Immigrant"), size = nrow(lung), replace = TRUE)
+lung$origin <- factor( lung$origin)
+lung$origin <- relevel( lung$origin, ref = "Danish" )
+
+lung_non_western <- lung %>% filter( origin %in% c( "Danish", "Non-Western Immigrant")) %>% droplevels() 
+lung_western <- lung %>% filter( origin %in% c("Danish", "Western Immigrant")) %>% droplevels() 
+
+non_western_test1 <- survival::coxph( survival::Surv( time, status==2) ~ origin , lung_non_western)
+non_western_test2 <- survival::coxph( survival::Surv( time, status==2) ~ origin + inst + age , lung_non_western)
+non_western_test3 <- survival::coxph( survival::Surv( time, status==2) ~ origin + inst + age + sex + ph.ecog , lung_non_western)
+non_western_test4 <- survival::coxph( survival::Surv( time, status==2) ~ origin + inst + age + sex + ph.ecog + ph.karno , lung_non_western)
+non_western_test5 <- survival::coxph( survival::Surv( time, status==2) ~ origin + inst + age + sex + ph.ecog + ph.karno + pat.karno , lung_non_western)
+non_western_test6 <- survival::coxph( survival::Surv( time, status==2) ~ origin + inst + age + sex + ph.ecog + ph.karno + pat.karno + meal.cal, lung_non_western)
+non_western_test7 <- survival::coxph( survival::Surv( time, status==2) ~ origin + inst + age + sex + ph.ecog + ph.karno + pat.karno + meal.cal + wt.loss, lung_non_western)
+
+
+western_test1 <- survival::coxph( survival::Surv( time, status==2) ~ origin , lung_western)
+western_test2 <- survival::coxph( survival::Surv( time, status==2) ~ origin + inst + age , lung_western)
+western_test3 <- survival::coxph( survival::Surv( time, status==2) ~ origin + inst + age + sex + ph.ecog , lung_western)
+western_test4 <- survival::coxph( survival::Surv( time, status==2) ~ origin + inst + age + sex + ph.ecog + ph.karno , lung_western)
+western_test5 <- survival::coxph( survival::Surv( time, status==2) ~ origin + inst + age + sex + ph.ecog + ph.karno + pat.karno , lung_western)
+western_test6 <- survival::coxph( survival::Surv( time, status==2) ~ origin + inst + age + sex + ph.ecog + ph.karno + pat.karno + meal.cal, lung_western)
+western_test7 <- survival::coxph( survival::Surv( time, status==2) ~ origin + inst + age + sex + ph.ecog + ph.karno + pat.karno + meal.cal + wt.loss, lung_western)
+
+list(
+ non_western_test1,
+ non_western_test2,
+ non_western_test3,
+ non_western_test4,
+ non_western_test5,
+ non_western_test6,
+ non_western_test7  )  -> non_western_list 
+
+list(
+ western_test1,
+ western_test2,
+ western_test3,
+ western_test4,
+ western_test5,
+ western_test6,
+ western_test7 
+ )  -> western_list 
+
+
+
+non_western_list %>% purrr::map( .f = function(x) {
+  
+  coef_in_model <- paste0( names(coef(x)), collapse = ", " )
+  tidy_model    <- broom::tidy(x, exponentiate = TRUE) %>% head(1)
+  tidy_model$names1 <- coef_in_model
+  tidy_model %>% select( Covariates = names1, HR = estimate, conf.low, conf.high)
+}                               ) %>% bind_rows()  %>%
+  
+  transmute( Covariates, HR = round(HR, 2), CI = paste0( format( round( conf.low, 2),nsmall = 2), " - ", format( round( conf.high, 2),nsmall = 2)) )  -> left_table
+
+
+western_list %>% purrr::map( .f = function(x) {
+  
+  coef_in_model <- paste0( names(coef(x)), collapse = ", " )
+  tidy_model    <- broom::tidy(x, exponentiate = TRUE) %>% head(1)
+  tidy_model$names1 <- coef_in_model
+  tidy_model %>% select( Covariates = names1, HR = estimate, conf.low, conf.high)
+}                               ) %>% bind_rows()  %>%
+  
+  transmute( Covariates, HR = round(HR, 2), CI = paste0( format( round( conf.low, 2),nsmall = 2), " - ", format( round( conf.high, 2),nsmall = 2)) )  -> right_table
+
+
+bind_cols( left_table,  right_table[,-1] ) 
 
 
 
