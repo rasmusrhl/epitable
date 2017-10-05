@@ -2,6 +2,11 @@
 #'
 #'
 #' @description A new version of \code{freq_by} which has more features.
+#' @param dataset A dataset
+#' @param var_vector A character vector referring to column names in the
+#'     \code{dataset}.
+#' @param by_group A string referring to a column name in the \code{dataset}.
+#'     Must be of type \code{factor}.
 #'
 #'
 #'
