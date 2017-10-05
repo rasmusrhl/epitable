@@ -54,17 +54,6 @@ freq_by <- function(dataset, var_vector, by_group = NULL, include_total = TRUE, 
   }
 
 
-
-
-
-
-
-
-
-
-
-
-
     df_temp                   <- droplevels(as.data.frame(dataset)) # convert to data.frame for easier extraction of values
     dataset                   <- dplyr::as_tibble( droplevels(dataset) )
     by_group_test             <- df_temp[, by_group]
