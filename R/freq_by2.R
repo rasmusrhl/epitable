@@ -28,9 +28,9 @@ diamonds$cut[100:200] <- NA
 var_vector <- c("cut","color", "price" )
 
 # function
-freq_by <- function(dataset, var_vector, by_group = NULL, include_total = FALSE, min_cell_count = 0, htmlout = TRUE, font_css = "font-family: monospace;",
+freq_by <- function(dataset, var_vector, by_group = NULL,  min_cell_count = 0, htmlout = TRUE, font_css = "font-family: monospace;", decimal_percent   = 0,
                     include_p_value   = FALSE,
-                    decimal_percent   = 0,
+                    include_total     = TRUE,
                     include_n         = TRUE,
                     include_percent   = TRUE,
                     include_cumpct    = FALSE,
@@ -41,9 +41,7 @@ freq_by <- function(dataset, var_vector, by_group = NULL, include_total = FALSE,
 
   # Initial checks and conversion -------------------------------------------
 
-  if (!rlang::is_null(by_group)) {
   by_group_symbol         <- rlang::sym(by_group)
-  }
   var_vector_numeric      <- dataset[, var_vector ] %>% dplyr::select_if( is.numeric ) %>% names()
   var_vector_char         <- dataset[, var_vector ] %>% dplyr::select_if( function(x) is.factor(x) | is.character(x) ) %>% names()
 
@@ -51,7 +49,7 @@ freq_by <- function(dataset, var_vector, by_group = NULL, include_total = FALSE,
 
   freq_fun_by <- function(dataset, var_vector_char_element) {
 
-    if( ! rlang::is_null(by_group)) {
+
     char_element_symbol      <-  rlang::sym(var_vector_char_element)
     by_group_vector          <-  dataset               %>% pull(UQ(by_group_symbol))
     var_vector_element_pull  <-  dataset               %>% pull(UQ(var_vector_char_element))
@@ -59,7 +57,6 @@ freq_by <- function(dataset, var_vector, by_group = NULL, include_total = FALSE,
     chi_test               <- chisq.test( x = by_group_vector, y = var_vector_element_pull  ) %>% tidy()
     chi_test$var_vector    <- var_vector_char_element
     # count
-
     dataset %>% count(UQ(by_group_symbol), UQ(char_element_symbol)) %>% complete( UQ(by_group_symbol), UQ(char_element_symbol), fill = list( n = 0 )) %>%
 
       group_by(UQ(by_group_symbol))  %>%
@@ -89,12 +86,13 @@ freq_by <- function(dataset, var_vector, by_group = NULL, include_total = FALSE,
 
       Reduce( function(x, y) left_join(x, y, by = c("covariate", "category" )), . ) -> freq_fun_output
 
+
+
     if(include_p_value) {
       freq_fun_output$pvalue <- NA
-      freq_fun_output$pvalue[1] <- chi_test$p.value
-
+      freq_fun_output$pvalue[1] <- round( chi_test$p.value, 5)
     }
-    } # closes if( !if_null(by_group) )
+
 
   # freq_fun_total
 
@@ -119,7 +117,7 @@ freq_by <- function(dataset, var_vector, by_group = NULL, include_total = FALSE,
 
 
       transmute(      covariate, category,          n,             pct,         cumpct,         cumsum,         subtotal,         n_missing )  %>%
-      # selecting the columns
+    # selecting the columns
     select_if(    c( TRUE      , TRUE    ,    include_n, include_percent, include_cumpct, include_cumsum, include_subtotal, include_n_missing )) %>%
 
     ungroup()    ->    freq_fun_total_output
@@ -134,28 +132,86 @@ freq_by <- function(dataset, var_vector, by_group = NULL, include_total = FALSE,
     names(freq_fun_total_output)       <- paste0(names(freq_fun_total_output), "_total") # paste "_total" to names
     names(freq_fun_total_output)[1:2]  <- c("covariate", "category")
 
-    if (include_total & ! rlang::is_null(by_group)) {
+    if (include_total ) {
     dplyr::full_join(freq_fun_total_output, freq_fun_output, by = c("covariate", "category") ) -> freq_fun_output
     }
-    freq_fun_output
+
+  freq_fun_output # is the only object returned from the function
+  }# end of freq_fun_by freq_fun_total
+
+   var_vector %>%
+      purrr::map(  function(x) freq_fun_by(dataset, x) ) %>% bind_rows() -> table1
+   # freq_fun_output
 
 
 
-  } # end of freq_fun_by and freq_fun_total
+   header_total <- c("n",                   "%", "Cum. n", "Cum. %", "Subtotal" , "n missing")
+   header_total <- header_total[ c(include_n, include_percent, include_cumsum, include_cumpct, include_subtotal, include_n_missing ) ]
 
 
- # application of freq_fun_by ---------------------------------------------------------
+   levels_group     <-  dataset               %>% pull(UQ(by_group_symbol))
+   levels_group     <-  levels(levels_group)
 
-     var_vector_char %>%
-       purrr::map( .f = function(x) freq_fun_by(dataset, x ) ) %>% dplyr::bind_rows()   -> freq_fun_output
-
-     n_columns <- c( TRUE      , TRUE    ,    include_n, include_percent, include_cumpct, include_cumsum, include_subtotal, include_n_missing )
-     n_columns <- c( n_columns, include_p_value )
-
-     freq_fun_output
-     freq_fun_output
-  }
-
-freq_by(diamonds, c("cut") )
+   html_col_header  <- c(" ", header_total, rep( header_total, times = length(levels_group)) )
+   if (include_p_value) {
+   html_col_header  <- c( html_col_header, "p-value")
+   }
 
 
+   c_group    <-  levels_group
+   if (include_total) {
+     c_group  <- c(" ", "Total", levels_group) } else {
+       c_group <- c(" ", levels_group )
+     }
+
+   if ( include_total ) {
+     c_group_len <- c(1, length(header_total), rep( length(header_total), times = length(levels_group)) )
+   } else {
+     c_group_len <- c(1, rep( length(header_total), times = length(levels_group)) )
+   }
+
+   if (include_p_value) {
+     c_group_len[ length(c_group_len ) ] <-   c_group_len[ length(c_group_len ) ]  + 1
+   }
+
+   rle_vector <- rle( as.character(table1$covariate) )
+   rgroup_vector <- rle_vector$values
+   rgroup_vector <- stringr::str_to_title(rgroup_vector)
+   n_rgroup_vector <- rle_vector$lengths
+
+
+   alignment  <- c("l", rep("r", ncol(table1) - 1 ))
+   list(table1, html_col_header, c_group, c_group_len )
+
+   table1         <- table1[,-1]
+   names(table1)  <- html_col_header
+
+   css_matrix     <- matrix(data     = "padding-left: 0.5cm; padding-right: 0.5cm;",
+                            nrow     = nrow(table1),
+                            ncol     = ncol(table1))
+
+   css_matrix[, 1]   <- "padding-left: 0.4cm; padding-right: 0.3cm;"
+
+
+
+
+   htmlTable::htmlTable( x = table1, rnames = FALSE,
+                         rgroup = rgroup_vector,
+                         n.rgroup = n_rgroup_vector,
+                         cgroup   = c_group,
+                         n.cgroup = c_group_len,
+                         align    = alignment,
+                         css.rgroup = "font-style: italic;padding-top: 0.4cm;padding-right: 0.4cm;padding-bottom: 0.2cm;",
+                         css.cell   = css_matrix
+                         )
+
+   # htmlTable::htmlTable()
+}
+freq_by( dataset = diamonds, var_vector = c("cut", "clarity"), by_group = "color",
+         include_total = TRUE, include_cumpct = FALSE, include_p_value = TRUE ) -> output
+write_file(  x = output, path = temp)
+utils::browseURL(temp)
+
+
+
+temp <- tempfile("test", fileext = ".html")
