@@ -1,17 +1,5 @@
 #' @title  Frequencies and percentages, and other statistics
 #' @description \code{freq_by2} creates frequency and percentage tables in HTML.
-#'
-<<<<<<< HEAD
-=======
-#'
-#'
-#'
-#'
-#'
-#' The problem is something about what to do when by_group is null. Then automatically, somehow, the marginal analysis should be made. However it says freq_fun_output not found....
-#'
-#' @description A new version of \code{freq_by} which has more features.
->>>>>>> 3146d5b8b01c56f3ec16553e1138a29964b2cf19
 #' @param dataset A dataset
 #' @param var_vector A character vector containing names of the columns in the
 #' \code{dataset} to calculate frequencies and percentages for.
@@ -40,6 +28,7 @@
 library(tidyverse)
 library(rlang)
 library(broom)
+
 # test data
 diamonds  <- ggplot2::diamonds
 diamonds$group_var   <- sample( x = c("Group 1", "Group 2"), size = nrow(diamonds), replace = TRUE)
@@ -86,7 +75,7 @@ var_vector_element_pull  <-  dataset               %>% pull(UQ(var_vector_char_e
 
 
     transmute(     group,  covariate, category,            n,             pct,         cumpct,         cumsum,         subtotal,         n_missing )  %>%
-=======
+
 freq_by <- function(dataset, var_vector, by_group = NULL,  min_cell_count = 0, htmlout = TRUE, font_css = "font-family: monospace;", decimal_percent   = 0,
                     include_p_value   = FALSE,
                     include_total     = TRUE,
@@ -176,7 +165,7 @@ freq_by <- function(dataset, var_vector, by_group = NULL,  min_cell_count = 0, h
 
 
       transmute(      covariate, category,          n,             pct,         cumpct,         cumsum,         subtotal,         n_missing )  %>%
->>>>>>> 3146d5b8b01c56f3ec16553e1138a29964b2cf19
+
     # selecting the columns
     select_if(    c( TRUE      , TRUE    ,    include_n, include_percent, include_cumpct, include_cumsum, include_subtotal, include_n_missing )) %>%
 
@@ -271,14 +260,3 @@ freq_by( dataset = diamonds, var_vector = c("cut", "clarity"), by_group = "color
          include_total = TRUE, include_cumpct = FALSE, include_p_value = TRUE ) -> output
 write_file(  x = output, path = temp)
 utils::browseURL(temp)
-
-<<<<<<< HEAD
-diamonds %>% names() -> testvektor
-testvektor <- testvektor[1:9]
-freq_by2(diamonds, var_vector = testvektor,  by_group = "group_var", include_cumpct = FALSE, include_p_value = TRUE )
-freq_by2(diamonds, var_vector = var_vector,  by_group = "group_var", include_cumpct = FALSE, include_p_value = TRUE, include_subtotal = TRUE )
-=======
->>>>>>> 3146d5b8b01c56f3ec16553e1138a29964b2cf19
-
-
-temp <- tempfile("test", fileext = ".html")
