@@ -5,9 +5,10 @@
 #' @param univariate_models_list List of univariate models
 #' @param multivariate_models_list List of univariate models
 #' @param decimals_estimate A number specifying decimals on estimates. Default is 2.
-#' @param font_css A string of CSS code defining the font used for the table. Default is
-#'     'font-family: monospace;'. A monospace font necessary for perfect
-#'     alignment of table cells. Another option:'font-family: "Courier New";'
+#' @param font_css A string of CSS code defining the font used for the table.
+#'     Default is 'font-family: Times;'. An example of another option is:
+#'     'font-family: "Courier New";' Only fonts supported by the browser are
+#'     supported.
 #' @param exponentiate logical. Sent to broom::tidy(). Defaults to FALSE.
 #'     Set to TRUE to exponentiate coefficients and CI of model summary.
 #' @param cgroup_names A character vector of length equal to 1 + length of
@@ -36,7 +37,7 @@ model_to_html <- function( univariate_models_list,
                            exponentiate = FALSE,
                            cgroup_names = NULL,
                            html_output  = TRUE,
-                           font_css = "font-family: monospace;"  ) {
+                           font_css = "font-family: Times;"  ) {
 
 
 # Check input -------------------------------------------------------------
@@ -115,6 +116,8 @@ model_to_html <- function( univariate_models_list,
     } else {
      model_with_ref <- broom::tidy( model_object ); print("Model class not detected")
     }
+
+    model_with_ref$term     <- stringr::str_replace_all( model_with_ref$term, pattern = "`", replacement = "" ) # Character backtick "`" is removed so join is possible. (feels like a hack :/ )
 
     suppressWarnings( dplyr::left_join( left_column, model_with_ref, "term" ) ) -> model_with_ref
     model_with_ref

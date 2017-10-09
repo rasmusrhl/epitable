@@ -2,13 +2,13 @@
 library(dplyr)
 library(epitable)
 library(knitr)
-knitr::opts_chunk$set( cache = TRUE )
+knitr::opts_chunk$set( cache = FALSE )
 
 ## ------------------------------------------------------------------------
 head(example_data) 
 
 ## ------------------------------------------------------------------------
-freq_by(dataset = example_data, var_vector = c("color", "clarity"), by_group = "cut", font_css = "font-family: Times" )
+freq_by(dataset = example_data, var_vector = c("color", "clarity"), by_group = "cut" )
 
 ## ------------------------------------------------------------------------
 # univariate models in a list:
@@ -27,14 +27,25 @@ model_to_html(univariate_models_list = univar_list,
               exponentiate = TRUE, html_output = TRUE ) 
 
 
-## ---- results='asis'-----------------------------------------------------
- df         <- dplyr::as_tibble(survival::lung)
- df$age_bin <- Hmisc::cut2( df$age, g = 5)
- df$ph_bin  <- Hmisc::cut2( df$ph.karno, g = 5)
- df$sex     <- factor( df$sex)
- model1      <- survival::coxph( survival::Surv( time = time, event = status==1) ~ age_bin + sex + ph_bin + wt.loss, data = df )
- model_to_html(model1, exponentiate = TRUE )
- 
+## ------------------------------------------------------------------------
+lung <- survival::lung
+c( "inst",  "age", "sex", "ph.ecog", "ph.karno", "pat.karno", "meal.cal", "wt.loss" )  %>%
+  paste0( " survival::Surv( time, status==2) ~ ", . ) %>%
+  purrr::map( ~ survival::coxph( as.formula(.), data = lung )) -> univariate_coxph_list
+
+coxph_model1 <- survival::coxph( survival::Surv( time, status==2) ~ inst + age + sex, lung)
+coxph_model2 <- survival::coxph( survival::Surv( time, status==2) ~ inst + age + sex + ph.ecog + ph.karno, lung)
+coxph_model3 <- survival::coxph( survival::Surv( time, status==2) ~ inst + age + sex + ph.ecog + ph.karno + pat.karno, lung)
+coxph_model4 <- survival::coxph( survival::Surv( time, status==2) ~ inst + age + sex + ph.ecog + ph.karno + pat.karno + meal.cal + wt.loss, lung)
+
+multivariate_coxph_list <- list( coxph_model1, coxph_model2, coxph_model3, coxph_model4 )
+model_to_html( univariate_coxph_list, multivariate_models_list = multivariate_coxph_list )
+
+## ------------------------------------------------------------------------
+model_to_html( univariate_coxph_list, multivariate_models_list = multivariate_coxph_list, font_css = "font-family: Times;", decimals_estimate = 4)
+
+## ------------------------------------------------------------------------
+freq_by(dataset = example_data, var_vector = c("color", "clarity"), by_group = "cut", font_css = "font-family: Arial" )
 
 ## ----eval=FALSE----------------------------------------------------------
 #  <style type="text/css">

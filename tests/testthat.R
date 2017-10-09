@@ -15,14 +15,27 @@
  diamonds <- ggplot2::diamonds
  diamonds$color <- factor(diamonds$color, ordered = FALSE)
  diamonds$clarity <- factor(diamonds$clarity, ordered = FALSE)
- glm_logistic <- glm( cut=="Ideal" ~  color + clarity + x , data = diamonds, family = "binomial")
+ diamonds$`This is a very strange Variable` <- diamonds$color
+
+glm_logistic <- glm( cut=="Ideal" ~ `This is a very strange Variable`  + clarity + x , data = diamonds, family = "binomial")
+output <- model_to_html(univariate_models_list = glm_logistic, exponentiate = TRUE, font_css = "font-family: Times;" )
+tempfile <- tempfile(pattern = "file", tmpdir = tempdir(), fileext = ".html")
+readr::write_file( output, tempfile)
+utils::browseURL(tempfile)
+
+
+
+
+
+
+
+
  glm_linear <- glm( Sepal.Width ~  Petal.Width + Sepal.Length + Petal.Length +  Species, data = iris)
 
 
 epitable:::model_gets_ref_levels(glm_linear)  %>%
 epitable:::model_gets_formatted_numbers()
 
-model_to_html(univariate_models_list = glm_logistic, exponentiate = TRUE )
 model_to_html(univariate_models_list = model1, exponentiate = TRUE )
 
 model_to_html(glm_logistic, exponentiate = TRUE) -> htmloutput

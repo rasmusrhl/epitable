@@ -1,16 +1,29 @@
+#' @title  Frequencies and percentages, and other statistics
+#' @description \code{freq_by2} creates frequency and percentage tables in HTML.
 #'
-#'
-#'
-#' @description A new version of \code{freq_by} which has more features.
 #' @param dataset A dataset
-#' @param var_vector A character vector referring to column names in the
-#'     \code{dataset}.
-#' @param by_group A string referring to a column name in the \code{dataset}.
-#'     Must be of type \code{factor}.
-#'
-#'
-#'
-#'
+#' @param var_vector A character vector containing names of the columns in the
+#' \code{dataset} to calculate frequencies and percentages for.
+#' @param by_group A string referring to a factor column in the \code{dataset}
+#' by which to stratify the calculations.
+#' @param include_total whether to include two extra columns of marginal
+#' frequencies and percentages, i.e. not stratified by the \code{by_group}.
+#' @param font_css A string of CSS code defining the font used for the table.
+#'      Default is'font-family: monospace;'.
+#' @param htmlout Whether to output to html (default and intended usage), or
+#' as r-dataframe.
+#' @param min_cell_count a number which defaults to 10. Used to preserve
+#'     anonymity in case of sensitive data. In cells with <= 10 observations,
+#'     the string "<=10" is printed.
+#' @details The output is a table in HTML which can be viewed in a browser or
+#' included in a knitr-report.
+#' @import tidyverse rlang
+#' @importFrom dplyr "%>%"
+#' @export freq_by
+#' @examples
+#' # Outputs HTML:
+#' output <-
+#' freq_by2(example_data, c("cut", "color"), "clarity", htmlout = FALSE, min_cell_count = 30)
 
 
 library(tidyverse)
@@ -23,7 +36,7 @@ diamonds$cut[100:200] <- NA
 var_vector <- c("cut","color", "price" )
 
 # function
-freq_by <- function(dataset, var_vector, by_group = NULL, include_total = TRUE, min_cell_count = 10, htmlout = TRUE, font_css = "font-family: monospace;",
+freq_by2 <- function(dataset, var_vector, by_group = NULL, include_total = TRUE, min_cell_count = 10, htmlout = TRUE, font_css = "font-family: monospace;",
                     include_p_value = FALSE,
                     decimal_percent = 0,
                     include_n = TRUE, include_percent = TRUE,
@@ -88,7 +101,7 @@ var_vector_char %>%
 
 diamonds %>% names() -> testvektor
 testvektor <- testvektor[1:9]
-freq_by(diamonds, var_vector = testvektor,  by_group = "group_var", include_cumpct = FALSE, include_p_value = TRUE )
-freq_by(diamonds, var_vector = var_vector,  by_group = "group_var", include_cumpct = FALSE, include_p_value = TRUE, include_subtotal = TRUE )
+freq_by2(diamonds, var_vector = testvektor,  by_group = "group_var", include_cumpct = FALSE, include_p_value = TRUE )
+freq_by2(diamonds, var_vector = var_vector,  by_group = "group_var", include_cumpct = FALSE, include_p_value = TRUE, include_subtotal = TRUE )
 
 

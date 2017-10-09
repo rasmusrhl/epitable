@@ -2,7 +2,6 @@
 title: "`epitable` Create HTML Tables in the Style Used in Epidemiological Papers"
 output:
   html_document:
-    theme: flatly
     toc: yes
 vignette: >
   %\VignetteIndexEntry{epitable_vignette}
@@ -17,6 +16,9 @@ vignette: >
   margin-left: auto;
   margin-right: auto;
 }
+
+
+
 </style>
 
 
@@ -30,6 +32,8 @@ knitr::opts_chunk$set( cache = FALSE )
 ```
 
 
+    color: black;
+    border-bottom: 1px black; border-top: 2px black;
 
 `r Sys.Date()`
 
@@ -50,14 +54,12 @@ head(example_data)
 
 The `by_group` variable must be of class factor, to ensure correct order. The argument `min_cell_count` sets the minimum number of observations in a cell. It is inteded to preserve anonymity in case of sensitive data. When the cell count is <= `min_cell_count`, the number is deleted from that cell. 
 
-It is possible to change the font using the `font_css` argument, but the font needs to be web-friendly. Below the font is set to "font-family: Times":
 ```{r}
-freq_by(dataset = example_data, var_vector = c("color", "clarity"), by_group = "cut", font_css = "font-family: Times" )
+freq_by(dataset = example_data, var_vector = c("color", "clarity"), by_group = "cut" )
 ```
 
 
 
-For the purposes of this vignette the `font_css` is changed fromt the default monospace font to Times. 
 
 # `model_to_html`
 
@@ -79,12 +81,14 @@ glm_logistic_2 <- glm( Survived ~  Age + Embarked + Sex + Fare, data = titanic, 
 glm_logistic_3 <- glm( Survived ~  Age + Embarked + Sex + Fare + Pclass, data = titanic, family = "binomial")
 multi_model_list <- list(glm_logistic_1, glm_logistic_2,  glm_logistic_3 )
 
-model_to_html(univariate_models_list = univar_list,
-              multivariate_models_list = multi_model_list,
-              exponentiate = TRUE, html_output = TRUE ) 
-
 ```
 
+
+Using the two lists of models defined above the table is created:
+
+```{r}
+model_to_html( univar_list,  multi_model_list, exponentiate = TRUE )
+```
 
 ## Printing two lists of models of cox proportional hazards regression
 
@@ -112,6 +116,20 @@ You can change the number of digits and the font:
 ```{r}
 model_to_html( univariate_coxph_list, multivariate_models_list = multivariate_coxph_list, font_css = "font-family: Times;", decimals_estimate = 4)
 ```
+
+
+
+It is possible to change the font using the `font_css` argument, but the font needs to be web-friendly. Below the font is set to "font-family: Courier":
+```{r}
+freq_by(dataset = example_data, var_vector = c("color", "clarity"), by_group = "cut", font_css = "font-family: Arial" )
+```
+
+
+
+
+
+
+
 
 
 # To do in a possible future:

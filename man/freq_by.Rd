@@ -5,8 +5,7 @@
 \title{Frequencies and percentages}
 \usage{
 freq_by(dataset, var_vector, by_group = NULL, include_total = TRUE,
-  min_cell_count = 10, htmlout = TRUE,
-  font_css = "font-family: monospace;")
+  min_cell_count = 10, htmlout = TRUE, font_css = "font-family: Times;")
 }
 \arguments{
 \item{dataset}{A dataset}

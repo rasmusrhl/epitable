@@ -6,7 +6,7 @@
 \usage{
 model_to_html(univariate_models_list, multivariate_models_list = NULL,
   decimals_estimate = 2, exponentiate = FALSE, cgroup_names = NULL,
-  html_output = TRUE, font_css = "font-family: monospace;")
+  html_output = TRUE, font_css = "font-family: Times;")
 }
 \arguments{
 \item{univariate_models_list}{List of univariate models}
@@ -23,9 +23,10 @@ Set to TRUE to exponentiate coefficients and CI of model summary.}
 
 \item{html_output}{logical. Defaults to TRUE. Set to false to output data.frame.}
 
-\item{font_css}{A string of CSS code defining the font used for the table. Default is
-'font-family: monospace;'. A monospace font necessary for perfect
-alignment of table cells. Another option:'font-family: "Courier New";'}
+\item{font_css}{A string of CSS code defining the font used for the table.
+Default is 'font-family: Times;'. An example of another option is:
+'font-family: "Courier New";' Only fonts supported by the browser are
+supported.}
 }
 \description{
 Prints on or more lists of regression models to HTML. Currently

@@ -26,7 +26,7 @@
 #' freq_by(example_data, c("cut", "color"), "clarity", htmlout = FALSE, min_cell_count = 30)
 
 
-freq_by <- function(dataset, var_vector, by_group = NULL, include_total = TRUE, min_cell_count = 10, htmlout = TRUE, font_css = "font-family: monospace;" ) {
+freq_by <- function(dataset, var_vector, by_group = NULL, include_total = TRUE, min_cell_count = 10, htmlout = TRUE, font_css = "font-family: Times;" ) {
 
   # the worker founction. Defined here so that it inherits parameters from freq_by.
   freq_function <- function( dataset, var_vektor ) {
