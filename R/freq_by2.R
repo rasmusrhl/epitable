@@ -50,16 +50,12 @@ include_subtotal <- FALSE
 include_n_missing <- FALSE
 include_total <- TRUE
 
-### problem: sørg for at de kombinationer som er mindre end 10 får NA, ikke bare de færdige counts (fordi så kan
-man jo se at der er mindre end 10 i dem når der kommer til at stå "n<10", men i stedet. )
+### problem: Sæt kombinationer med mindre end min_cell_count til NA. Det er ikke nok at erstattet fx 3 med n<=3, for så kan man jo alligevel se at det er tilfældet.
 
+# this works!!
 iris %>% group_by(Species)  %>%
-  mutate( nn = n()) %>% ungroup() %>% mutate( Species = if_else( nn <= 10 , true  = NA_integer_, false = Species,  ))
+  mutate( nn = n()) %>% ungroup() %>% mutate( Species = replace( Species, nn <=60, NA ) )
 
-                                                                                                 nn > 10 ~ Species) )
-
-
-iri
 
 
 test_fun <- function(dataset, var_vector, by_group, min_cell_count = 10 ) {
