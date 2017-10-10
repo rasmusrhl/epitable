@@ -5,7 +5,11 @@
 \title{Frequencies and percentages}
 \usage{
 freq_by(dataset, var_vector, by_group = NULL, include_total = TRUE,
-  min_cell_count = 10, htmlout = TRUE, font_css = "font-family: Times;")
+  min_cell_count = 10, htmlout = TRUE,
+  font_css = "font-family: monospace;", include_p_value = FALSE,
+  decimal_percent = 0, include_n = TRUE, include_percent = TRUE,
+  include_cumpct = FALSE, include_cumsum = FALSE,
+  include_subtotal = FALSE, include_n_missing = FALSE)
 }
 \arguments{
 \item{dataset}{A dataset}
@@ -28,6 +32,23 @@ as r-dataframe.}
 
 \item{font_css}{A string of CSS code defining the font used for the table.
 Default is'font-family: monospace;'.}
+
+\item{include_p_value}{logical. Wheather to do \code{base::chisq.test} on the combination of
+\code{by_group} and each individual column referred to in \code{var_vector}.}
+
+\item{decimal_percent}{numeric. NUmber of decimals on the calculated percentages.}
+
+\item{include_n}{logical. Whether to include counts for each group.}
+
+\item{include_percent}{logical. Whether to include percentages.}
+
+\item{include_cumpct}{logical. Whether to include cumulative percentages.}
+
+\item{include_cumsum}{logical. Whether to include cumulative frequencies.}
+
+\item{include_subtotal}{logical. Whether to include subtotals.}
+
+\item{include_n_missing}{logical. Whether to include number of missing in each group.}
 }
 \description{
 \code{freq_by} creates frequency and percentage tables in HTML.
@@ -39,5 +60,5 @@ included in a knitr-report.
 \examples{
 # Outputs HTML:
 output <-
-freq_by(example_data, c("cut", "color"), "clarity", htmlout = FALSE, min_cell_count = 30)
+epitable::freq_by(example_data, c("cut", "color"), "clarity", htmlout = FALSE, min_cell_count = 30)
 }

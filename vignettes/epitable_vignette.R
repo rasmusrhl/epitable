@@ -22,10 +22,9 @@ glm_logistic_2 <- glm( Survived ~  Age + Embarked + Sex + Fare, data = titanic, 
 glm_logistic_3 <- glm( Survived ~  Age + Embarked + Sex + Fare + Pclass, data = titanic, family = "binomial")
 multi_model_list <- list(glm_logistic_1, glm_logistic_2,  glm_logistic_3 )
 
-model_to_html(univariate_models_list = univar_list,
-              multivariate_models_list = multi_model_list,
-              exponentiate = TRUE, html_output = TRUE ) 
 
+## ------------------------------------------------------------------------
+model_to_html( univar_list,  multi_model_list, exponentiate = TRUE )
 
 ## ------------------------------------------------------------------------
 lung <- survival::lung
