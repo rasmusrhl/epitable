@@ -178,7 +178,12 @@ freq_by <- function(dataset, var_vector, by_group = NULL, include_total = TRUE, 
     levels_group <- levels_group %>% levels() %>% as.character()
   }
 
-  html_col_header  <- c(" ", header_total, rep( header_total, times = length(levels_group)) )
+  # column names needs to fit the number of columns. If include_total, then html_col_header needs one more set of column names (for the total columns, i.e. the marginal calculations).
+    if (include_total) {
+    html_col_header  <- c(" ", header_total, rep( header_total, times = length(levels_group)) )
+    } else {
+    html_col_header  <- c(" ", rep( header_total, times = length(levels_group)) )
+    }
 
 
   c_group    <-  levels_group
